@@ -27,7 +27,7 @@ cd Create-UfoPort
 The output jar is in `build/libs/`.
 
 ## Credits
-- [1.21-1.21.1 Port Of Create Fabric](https://github.com/vlad250906/Create-UfoPort)
+- [1.21-1.21.1 Port Of Create Fabric](https://github.com/blazebsc/Create-UfoPort)
 - [Create Fabric](https://github.com/Fabricators-of-Create/Create)
 - [Porting Lib](https://github.com/Fabricators-of-Create/Porting-Lib)
 - [Flywheel](https://github.com/Engine-Room/Flywheel)
