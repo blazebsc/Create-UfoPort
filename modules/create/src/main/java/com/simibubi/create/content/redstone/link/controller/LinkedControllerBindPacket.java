@@ -50,8 +50,8 @@ public class LinkedControllerBindPacket extends LinkedControllerPacketBase {
 			.forEachWithContext((f, first) -> frequencyItems.setStackInSlot(button * 2 + (first ? 0 : 1), f.getStack()
 				.copy()));
 
-		ItemHelper.getOrCreateComponent(heldItem, AllDataComponents.FILTER_DATA, new CompoundTag())
-			.put("Items", frequencyItems.serializeNBT());
+		heldItem.set(AllDataComponents.LINKED_CONTROLLER_ITEMS, ItemHelper.containerContentsFromHandler(frequencyItems));
+		heldItem.remove(AllDataComponents.FILTER_DATA);
 	}
 
 	@Override

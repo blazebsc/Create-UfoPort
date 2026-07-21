@@ -4,7 +4,6 @@ import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.AllTags;
 import com.simibubi.create.foundation.networking.SimplePacketBase;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -36,10 +35,9 @@ public class PlaceExtendedCurvePacket extends SimplePacketBase {
 		context.enqueueWork(() -> {
 			ServerPlayer sender = context.getSender();
 			ItemStack stack = sender.getItemInHand(mainHand ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
-			if (!AllTags.AllBlockTags.TRACKS.matches(stack) || !stack.has(AllDataComponents.TRACK_ITEM))
+			if (!AllTags.AllBlockTags.TRACKS.matches(stack) || !stack.has(AllDataComponents.TRACK_CONNECTING_FROM))
 				return;
-			CompoundTag tag = stack.get(AllDataComponents.TRACK_ITEM);
-			tag.putBoolean("ExtendCurve", true);
+			stack.set(AllDataComponents.TRACK_EXTENDED_CURVE, true);
 		});
 		return true;
 	}

@@ -1,28 +1,21 @@
 package com.simibubi.create.content.fluids.particle;
 
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.simibubi.create.AllParticleTypes;
 import com.simibubi.create.foundation.particle.ICustomParticleData;
-import com.simibubi.create.foundation.utility.RegisteredObjects;
-
 import io.github.fabricators_of_create.porting_lib_ufo.fluids.FluidStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.world.level.material.Fluids;
 
 public class FluidParticleData implements ParticleOptions, ICustomParticleData<FluidParticleData> {
 
@@ -54,16 +47,6 @@ public class FluidParticleData implements ParticleOptions, ICustomParticleData<F
 		return type;
 	}
 
-//	@Override
-//	public void writeToNetwork(FriendlyByteBuf buffer) {
-//		fluid.writeToPacket(buffer);
-//	}
-
-//	@Override
-//	public String writeToString() {
-//		return RegisteredObjects.getKeyOrThrow(type) + " " + RegisteredObjects.getKeyOrThrow(fluid.getFluid());
-//	}
-
 	public static final MapCodec<FluidParticleData> CODEC = RecordCodecBuilder.mapCodec(i -> i
 		.group(FluidStack.CODEC.fieldOf("fluid")
 			.forGetter(p -> p.fluid))
@@ -94,25 +77,6 @@ public class FluidParticleData implements ParticleOptions, ICustomParticleData<F
 			p -> new FluidParticleData(AllParticleTypes.FLUID_DRIP.get(), p)
 	);
 	
-//	public static final ParticleOptions.Deserializer<FluidParticleData> DESERIALIZER =
-//		new ParticleOptions.Deserializer<FluidParticleData>() {
-//
-//			// TODO Fluid particles on command
-//			public FluidParticleData fromCommand(ParticleType<FluidParticleData> particleTypeIn, StringReader reader)
-//				throws CommandSyntaxException {
-//				return new FluidParticleData(particleTypeIn, new FluidStack(Fluids.WATER, 1));
-//			}
-//
-//			public FluidParticleData fromNetwork(ParticleType<FluidParticleData> particleTypeIn, FriendlyByteBuf buffer) {
-//				return new FluidParticleData(particleTypeIn, FluidStack.readFromPacket(buffer));
-//			}
-//		};
-//
-//	@Override
-//	public Deserializer<FluidParticleData> getDeserializer() {
-//		return DESERIALIZER;
-//	}
-
 	@Override
 	public MapCodec<FluidParticleData> getCodec(ParticleType<FluidParticleData> type) {
 		if (type == AllParticleTypes.BASIN_FLUID.get())

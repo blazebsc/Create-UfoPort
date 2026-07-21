@@ -448,15 +448,14 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
 	}
 
 	protected void initializePrinter(ItemStack blueprint) {
-		if (!blueprint.has(AllDataComponents.SCHEMATIC_DATA)) {
+		if (!blueprint.has(AllDataComponents.SCHEMATIC_FILE)) {
 			state = State.STOPPED;
 			statusMsg = "schematicInvalid";
 			sendUpdate = true;
 			return;
 		}
 
-		if (!blueprint.get(AllDataComponents.SCHEMATIC_DATA)
-				.getBoolean("Deployed")) {
+		if (!blueprint.getOrDefault(AllDataComponents.SCHEMATIC_DEPLOYED, false)) {
 			state = State.STOPPED;
 			statusMsg = "schematicNotPlaced";
 			sendUpdate = true;

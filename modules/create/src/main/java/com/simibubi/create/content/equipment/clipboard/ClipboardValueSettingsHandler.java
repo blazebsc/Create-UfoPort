@@ -12,7 +12,6 @@ import com.simibubi.create.content.equipment.clipboard.ClipboardOverrides.Clipbo
 import com.simibubi.create.content.trains.track.TrackBlockOutline;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.utility.AdventureUtil;
 import com.simibubi.create.foundation.utility.Components;
 import com.simibubi.create.foundation.utility.Lang;
@@ -94,8 +93,8 @@ public class ClipboardValueSettingsHandler {
 		if (!(mc.level.getBlockEntity(pos) instanceof SmartBlockEntity smartBE))
 			return;
 
-		CompoundTag tagElement = player.getMainHandItem().
-				getOrDefault(AllDataComponents.CLIPBOARD_EDITING, new CompoundTag()).getCompound("CopiedValues");
+		CompoundTag tagElement = player.getMainHandItem()
+				.getOrDefault(AllDataComponents.CLIPBOARD_EDITING, ClipboardData.EMPTY).tag().getCompound("CopiedValues");
 
 		boolean canCopy = smartBE.getAllBehaviours()
 			.stream()
@@ -142,7 +141,7 @@ public class ClipboardValueSettingsHandler {
 			return InteractionResult.PASS;
 		if (!(world.getBlockEntity(pos) instanceof SmartBlockEntity smartBE))
 			return InteractionResult.PASS;
-		CompoundTag tag = itemStack.getOrDefault(AllDataComponents.CLIPBOARD_EDITING, new CompoundTag()).getCompound("CopiedValues");
+		CompoundTag tag = itemStack.getOrDefault(AllDataComponents.CLIPBOARD_EDITING, ClipboardData.EMPTY).tag().getCompound("CopiedValues");
 		if (paste && tag == null)
 			return InteractionResult.PASS;
 		if (!paste)
@@ -200,7 +199,7 @@ public class ClipboardValueSettingsHandler {
 
 		if (!paste) {
 			ClipboardOverrides.switchTo(ClipboardType.WRITTEN, itemStack);
-			ItemHelper.getOrCreateComponent(itemStack, AllDataComponents.CLIPBOARD_EDITING, new CompoundTag()).put("CopiedValues", tag);
+			ClipboardData.getOrCreate(itemStack).put("CopiedValues", tag);
 		}
 		return InteractionResult.SUCCESS;
 	}

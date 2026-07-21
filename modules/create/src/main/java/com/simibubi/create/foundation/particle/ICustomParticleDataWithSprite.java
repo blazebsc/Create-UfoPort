@@ -1,6 +1,5 @@
 package com.simibubi.create.foundation.particle;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 
 import net.fabricmc.api.EnvType;
@@ -15,8 +14,6 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 
 public interface ICustomParticleDataWithSprite<T extends ParticleOptions> extends ICustomParticleData<T> {
-
-	//Deserializer<T> getDeserializer();
 
 	public default ParticleType<T> createType() {
 		return new ParticleType<T>(false) {

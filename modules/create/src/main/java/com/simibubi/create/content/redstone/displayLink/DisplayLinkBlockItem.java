@@ -11,7 +11,6 @@ import io.github.fabricators_of_create.porting_lib_ufo.item.BlockUseBypassingIte
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -85,7 +84,6 @@ public class DisplayLinkBlockItem extends BlockItem implements BlockUseBypassing
 			return InteractionResult.SUCCESS;
 		}
 
-		//CompoundTag tag = stack.getTag();
 		CompoundTag teTag = new CompoundTag();
 
 		BlockPos selectedPos = stack.get(AllDataComponents.DISPLAY_LINK_POS);
@@ -106,9 +104,10 @@ public class DisplayLinkBlockItem extends BlockItem implements BlockUseBypassing
 			return useOn;
 
 		ItemStack itemInHand = player.getItemInHand(pContext.getHand());
-		if (!itemInHand.isEmpty())
-			itemInHand.applyComponents(DataComponentMap.EMPTY);
-			//itemInHand.setTag(null);
+		if (!itemInHand.isEmpty()) {
+			itemInHand.remove(AllDataComponents.DISPLAY_LINK_POS);
+			itemInHand.remove(DataComponents.BLOCK_ENTITY_DATA);
+		}
 		player.displayClientMessage(Lang.translateDirect("display_link.success")
 			.withStyle(ChatFormatting.GREEN), true);
 		return useOn;

@@ -1,9 +1,5 @@
 package com.simibubi.create.content.kinetics.base;
 
-import java.util.Locale;
-
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
@@ -16,10 +12,10 @@ import com.simibubi.create.foundation.particle.ICustomParticleDataWithSprite;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.ParticleEngine.SpriteParticleRegistration;
+import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -71,32 +67,6 @@ public class RotationIndicatorParticleData
 		(a1, a2, a3, a4, a5, a6) -> new RotationIndicatorParticleData(a1, a2, a3, a4, a5, (char)(a6.intValue()))
 	);
 
-//	public static final ParticleOptions.Deserializer<RotationIndicatorParticleData> DESERIALIZER =
-//		new ParticleOptions.Deserializer<RotationIndicatorParticleData>() {
-//			public RotationIndicatorParticleData fromCommand(ParticleType<RotationIndicatorParticleData> particleTypeIn,
-//				StringReader reader) throws CommandSyntaxException {
-//				reader.expect(' ');
-//				int color = reader.readInt();
-//				reader.expect(' ');
-//				float speed = (float) reader.readDouble();
-//				reader.expect(' ');
-//				float rad1 = (float) reader.readDouble();
-//				reader.expect(' ');
-//				float rad2 = (float) reader.readDouble();
-//				reader.expect(' ');
-//				int lifeSpan = reader.readInt();
-//				reader.expect(' ');
-//				char axis = reader.read();
-//				return new RotationIndicatorParticleData(color, speed, rad1, rad2, lifeSpan, axis);
-//			}
-//
-//			public RotationIndicatorParticleData fromNetwork(ParticleType<RotationIndicatorParticleData> particleTypeIn,
-//				FriendlyByteBuf buffer) {
-//				return new RotationIndicatorParticleData(buffer.readInt(), buffer.readFloat(), buffer.readFloat(),
-//					buffer.readFloat(), buffer.readInt(), buffer.readChar());
-//			}
-//		};
-
 	final int color;
 	final float speed;
 	final float radius1;
@@ -127,19 +97,30 @@ public class RotationIndicatorParticleData
 		return Axis.valueOf(axis + "");
 	}
 
-//	@Override
-//	public void writeToNetwork(FriendlyByteBuf buffer) {
-//		buffer.writeInt(color);
-//		buffer.writeFloat(speed);
-//		buffer.writeFloat(radius1);
-//		buffer.writeFloat(radius2);
-//		buffer.writeInt(lifeSpan);
-//		buffer.writeChar(axis);
-//	}
-
 	@Override
 	public MapCodec<RotationIndicatorParticleData> getCodec(ParticleType<RotationIndicatorParticleData> type) {
 		return CODEC;
+	}
+
+	@Override
+	public ParticleType<RotationIndicatorParticleData> createType() {
+		RotationIndicatorParticleData self = this;
+		return new ParticleType<RotationIndicatorParticleData>(false) {
+			@Override
+			public MapCodec<RotationIndicatorParticleData> codec() {
+				return self.getCodec(this);
+			}
+			@Override
+			public StreamCodec<? super RegistryFriendlyByteBuf, RotationIndicatorParticleData> streamCodec() {
+				return self.getStreamCodec(this);
+			}
+		};
+	}
+
+	@Override
+	@Environment(EnvType.CLIENT)
+	public ParticleProvider<RotationIndicatorParticleData> getFactory() {
+		throw new IllegalAccessError("This particle type uses a metaFactory!");
 	}
 
 	@Override

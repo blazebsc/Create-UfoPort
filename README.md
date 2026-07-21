@@ -1,24 +1,33 @@
 # Create-UfoPort
-An unoficial port of [Create Fabric mod](https://modrinth.com/mod/create-fabric) for Minecraft 1.21-1.21.1
 
-## Usage
-Download the mod from [Releases](https://github.com/vlad250906/Create-UfoPort/releases/) and install its dependensies:
-- [Forge Config Api Port](https://modrinth.com/mod/forge-config-api-port)
-- [Fabric API](https://modrinth.com/mod/fabric-api)
-- [Fabric Loader](https://fabricmc.net/use/installer/)
+An unofficial port of [Create Fabric](https://modrinth.com/mod/create-fabric) for Minecraft 1.21 / 1.21.1.
 
-## Incompatibilities
+## Installation
+
+Download the mod from [Releases](https://github.com/vlad250906/Create-UfoPort/releases/) and install the required dependencies:
+
+- [Fabric Loader](https://fabricmc.net/use/installer/) (>= 0.16.0)
+- [Fabric API](https://modrinth.com/mod/fabric-api) (>= 0.100.7)
+- [Forge Config API Port](https://modrinth.com/mod/forge-config-api-port) (>= 21.0.5)
+
+## Known Incompatibilities
+
 - [Farmer's Delight](https://modrinth.com/mod/farmers-delight-refabricated)
 
-If you find any incompatibility with a mod, feel free to send a pull request adding your incompatibility.
+If you find any incompatibility with a mod, feel free to open an issue or send a pull request.
 
-## Building from source
-1. Clone this repository
-2. Run `./gradlew build`
-3. Copy the result jar file from `build/libs/`
+## Building from Source
 
-## Code used from
-- [Build tools](https://github.com/Fabricators-of-Create/Porting-Lib)
+```
+git clone https://github.com/vlad250906/Create-UfoPort.git
+cd Create-UfoPort
+./gradlew build
+```
+
+The output jar is in `build/libs/`.
+
+## Credits
+- [1.21-1.21.1 Port Of Create Fabric](https://github.com/vlad250906/Create-UfoPort)
 - [Create Fabric](https://github.com/Fabricators-of-Create/Create)
 - [Porting Lib](https://github.com/Fabricators-of-Create/Porting-Lib)
 - [Flywheel](https://github.com/Engine-Room/Flywheel)

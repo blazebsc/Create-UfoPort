@@ -42,8 +42,9 @@ public class ClientMotionPacket extends SimplePacketBase {
 			if (sender == null)
 				return;
 			sender.setDeltaMovement(motion);
+			boolean wasOnGround = sender.onGround();
 			sender.setOnGround(onGround);
-			if (onGround) {
+			if (onGround && !wasOnGround && sender.fallDistance > 0) {
 				sender.causeFallDamage(sender.fallDistance, 1, sender.damageSources().fall());
 				sender.fallDistance = 0;
 				ServerGamePacketListenerImplAccessor access = (ServerGamePacketListenerImplAccessor) sender.connection;

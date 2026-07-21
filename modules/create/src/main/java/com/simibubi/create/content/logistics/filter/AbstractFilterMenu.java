@@ -6,7 +6,6 @@ import com.simibubi.create.foundation.item.ItemHelper;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -56,7 +55,8 @@ public abstract class AbstractFilterMenu extends GhostItemMenu<ItemStack> {
 
 	@Override
 	protected void saveData(ItemStack contentHolder) {
-		ItemHelper.getOrCreateComponent(contentHolder, AllDataComponents.FILTER_DATA, new CompoundTag()).put("Items", ghostInventory.serializeNBT());
+		contentHolder.set(AllDataComponents.FILTER_ITEMS, ItemHelper.containerContentsFromHandler(ghostInventory));
+		contentHolder.remove(AllDataComponents.FILTER_DATA);
 	}
 
 	@Override

@@ -51,7 +51,6 @@ public class ScreenUtils {
 
 		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-		//buffer.begin();
 		buffer.addVertex(matrix, right, top, z).setColor(startRed, startGreen, startBlue, startAlpha);
 		buffer.addVertex(matrix, left, top, z).setColor(startRed, startGreen, startBlue, startAlpha);
 		buffer.addVertex(matrix, left, bottom, z).setColor(endRed, endGreen, endBlue, endAlpha);
@@ -59,7 +58,6 @@ public class ScreenUtils {
 		MeshData data = buffer.build();
 		if(data != null)
 			BufferUploader.drawWithShader(data);
-		//tessellator.end();
 
 		RenderSystem.disableBlend();
 	}
@@ -75,7 +73,6 @@ public class ScreenUtils {
 			List<? extends FormattedText> textLines, int mouseX, int mouseY, int screenWidth, int screenHeight,
 			int maxTextWidth, int backgroundColor, int borderColorStart, int borderColorEnd, Font font) {
 		if (!textLines.isEmpty()) {
-			// RenderSystem.disableRescaleNormal();
 			RenderSystem.disableDepthTest();
 			int tooltipTextWidth = 0;
 
@@ -192,7 +189,6 @@ public class ScreenUtils {
 			mStack.popPose();
 
 			RenderSystem.enableDepthTest();
-			// RenderSystem.enableRescaleNormal();
 		}
 	}
 
@@ -326,6 +322,5 @@ public class ScreenUtils {
 		MeshData data = wr.build();
 		if(data != null)
 			BufferUploader.drawWithShader(data);
-		//tessellator.end();
 	}
 }

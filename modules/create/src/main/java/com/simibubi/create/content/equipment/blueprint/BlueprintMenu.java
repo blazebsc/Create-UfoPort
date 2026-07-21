@@ -94,8 +94,6 @@ public class BlueprintMenu extends GhostItemMenu<BlueprintSection> {
 		contentHolder.inferredIcon = true;
 		ItemStack toSend = itemstack.copy();
 		toSend.set(AllDataComponents.INFERRED_FROM_RECIPE, true);
-		//toSend.getOrCreateTag()
-				//.putBoolean("InferredFromRecipe", true);
 		serverplayerentity.connection.send(new ClientboundContainerSetSlotPacket(containerId, incrementStateId(), 36 + 9, toSend));
 	}
 

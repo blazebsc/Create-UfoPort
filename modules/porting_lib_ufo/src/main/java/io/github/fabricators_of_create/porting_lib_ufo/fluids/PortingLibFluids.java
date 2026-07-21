@@ -2,7 +2,6 @@ package io.github.fabricators_of_create.porting_lib_ufo.fluids;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
-import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -11,7 +10,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.PathType;
@@ -62,55 +60,6 @@ public class PortingLibFluids implements ModInitializer {
 				{
 					return canFluidLog ? super.getBlockPathType(state, level, pos, mob, true) : null;
 				}
-
-//				@Override
-//				public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer)
-//				{
-//					consumer.accept(new IClientFluidTypeExtensions()
-//					{
-//						private static final ResourceLocation UNDERWATER_LOCATION = ResourceLocation.fromNamespaceAndPath("textures/misc/underwater.png"),
-//								WATER_STILL = ResourceLocation.fromNamespaceAndPath("block/water_still"),
-//								WATER_FLOW = ResourceLocation.fromNamespaceAndPath("block/water_flow"),
-//								WATER_OVERLAY = ResourceLocation.fromNamespaceAndPath("block/water_overlay");
-//
-//						@Override
-//						public ResourceLocation getStillTexture()
-//						{
-//							return WATER_STILL;
-//						}
-//
-//						@Override
-//						public ResourceLocation getFlowingTexture()
-//						{
-//							return WATER_FLOW;
-//						}
-//
-//						@Nullable
-//						@Override
-//						public ResourceLocation getOverlayTexture()
-//						{
-//							return WATER_OVERLAY;
-//						}
-//
-//						@Override
-//						public ResourceLocation getRenderOverlayTexture(Minecraft mc)
-//						{
-//							return UNDERWATER_LOCATION;
-//						}
-//
-//						@Override
-//						public int getTintColor()
-//						{
-//							return 0xFF3F76E4;
-//						}
-//
-//						@Override
-//						public int getTintColor(FluidState state, BlockAndTintGetter getter, BlockPos pos)
-//						{
-//							return BiomeColors.getAverageWaterColor(getter, pos) | 0xFF000000;
-//						}
-//					});
-//				}
 			};
 	public static final FluidType LAVA_TYPE =
 			new FluidType(FluidType.Properties.create()
@@ -138,28 +87,6 @@ public class PortingLibFluids implements ModInitializer {
 					Vec3 vec3 = entity.getDeltaMovement();
 					entity.setDeltaMovement(vec3.x * (double)0.95F, vec3.y + (double)(vec3.y < (double)0.06F ? 5.0E-4F : 0.0F), vec3.z * (double)0.95F);
 				}
-
-//				@Override
-//				public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer)
-//				{
-//					consumer.accept(new IClientFluidTypeExtensions()
-//					{
-//						private static final ResourceLocation LAVA_STILL = ResourceLocation.fromNamespaceAndPath("block/lava_still"),
-//								LAVA_FLOW = ResourceLocation.fromNamespaceAndPath("block/lava_flow");
-//
-//						@Override
-//						public ResourceLocation getStillTexture()
-//						{
-//							return LAVA_STILL;
-//						}
-//
-//						@Override
-//						public ResourceLocation getFlowingTexture()
-//						{
-//							return LAVA_FLOW;
-//						}
-//					});
-//				}
 			};
 
 	@Override

@@ -12,7 +12,6 @@ import com.simibubi.create.content.fluids.potion.PotionFluid.BottleType;
 import com.simibubi.create.foundation.fluid.FluidHelper;
 import com.simibubi.create.foundation.fluid.FluidIngredient;
 import com.simibubi.create.foundation.utility.Components;
-import com.simibubi.create.foundation.utility.NBTHelper;
 import com.simibubi.create.foundation.utility.Pair;
 
 import io.github.fabricators_of_create.porting_lib_ufo.fluids.FluidStack;
@@ -24,7 +23,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.PatchedDataComponentMap;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -75,8 +73,7 @@ public class PotionFluidHandler {
 			return new FluidStack(Fluids.WATER, FluidConstants.BOTTLE);
 		
 		FluidStack fluid = PotionFluid.withEffects(FluidConstants.BOTTLE, potion, list);
-		CompoundTag tagInfo = fluid.getOrCreateComponent(AllDataComponents.BOTTLE_TYPE, new CompoundTag());
-		NBTHelper.writeEnum(tagInfo, "Bottle", bottleTypeFromItem);
+		fluid.set(AllDataComponents.BOTTLE_TYPE, bottleTypeFromItem);
 		FluidVariant variant = FluidVariant.of(fluid.getFluid(), ((PatchedDataComponentMap)fluid.getComponents()).asPatch());
 		return new FluidStack(variant, fluid.getAmount(), (PatchedDataComponentMap)fluid.getComponents());
 	}
@@ -85,7 +82,7 @@ public class PotionFluidHandler {
 		if (potion == Potions.WATER && bottleType == BottleType.REGULAR)
 			return new FluidStack(Fluids.WATER, amount);
 		FluidStack fluid = PotionFluid.of(amount, potion);
-		NBTHelper.writeEnum(fluid.getOrCreateComponent(AllDataComponents.BOTTLE_TYPE, new CompoundTag()), "Bottle", bottleType);
+		fluid.set(AllDataComponents.BOTTLE_TYPE, bottleType);
 		return new FluidStack(fluid.getFluid(), fluid.getAmount(), (PatchedDataComponentMap)fluid.getComponents());
 	}
 
@@ -114,8 +111,8 @@ public class PotionFluidHandler {
 	}
 
 	public static ItemStack fillBottle(ItemStack stack, FluidStack availableFluid) {
-		CompoundTag tag = availableFluid.getOrDefault(AllDataComponents.BOTTLE_TYPE, new CompoundTag());
-		ItemStack potionStack = new ItemStack(itemFromBottleType(NBTHelper.readEnum(tag, "Bottle", BottleType.class)));
+		BottleType bottleType = availableFluid.getOrDefault(AllDataComponents.BOTTLE_TYPE, BottleType.REGULAR);
+		ItemStack potionStack = new ItemStack(itemFromBottleType(bottleType));
 		potionStack.set(DataComponents.POTION_CONTENTS, availableFluid.get(DataComponents.POTION_CONTENTS));
 		//PotionUtils.setPotion(potionStack, PotionUtils.getPotion(tag));
 		//PotionUtils.setCustomEffects(potionStack, PotionUtils.getCustomEffects(tag));

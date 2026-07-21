@@ -10,7 +10,7 @@ import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.AllShapes;
 import com.simibubi.create.foundation.block.IBE;
-import com.simibubi.create.foundation.item.ItemHelper;
+
 import com.simibubi.create.foundation.utility.BlockHelper;
 
 import io.github.fabricators_of_create.porting_lib_ufo.util.NetworkHooks;
@@ -77,10 +77,19 @@ public class ToolboxBlock extends HorizontalDirectionalBlock implements SimpleWa
 		if (stack == null)
 			return;
 		withBlockEntityDo(worldIn, pos, be -> {
-			CompoundTag orCreateTag = ItemHelper.getOrCreateComponent(stack, AllDataComponents.TOOLBOX, new CompoundTag());
-			be.readInventory(orCreateTag.getCompound("Inventory"));
-			if (orCreateTag.contains("UniqueId"))
-				be.setUniqueId(orCreateTag.getUUID("UniqueId"));
+			if (stack.has(AllDataComponents.TOOLBOX_INVENTORY)) {
+				be.readInventory(stack.get(AllDataComponents.TOOLBOX_INVENTORY));
+			} else if (stack.has(AllDataComponents.TOOLBOX_LEGACY)) {
+				CompoundTag legacy = stack.get(AllDataComponents.TOOLBOX_LEGACY);
+				if (legacy != null) {
+					if (legacy.contains("Inventory"))
+						be.readInventory(legacy.getCompound("Inventory"));
+					if (legacy.contains("UniqueId"))
+						be.setUniqueId(legacy.getUUID("UniqueId"));
+				}
+			}
+			if (stack.has(AllDataComponents.TOOLBOX_UUID))
+				be.setUniqueId(stack.get(AllDataComponents.TOOLBOX_UUID));
 			if (stack.has(DataComponents.CUSTOM_NAME))
 				be.setCustomName(stack.getHoverName());
 		});
@@ -111,14 +120,14 @@ public class ToolboxBlock extends HorizontalDirectionalBlock implements SimpleWa
 	public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state) {
 		ItemStack item = new ItemStack(this);
 		Optional<ToolboxBlockEntity> blockEntityOptional = getBlockEntityOptional(world, pos);
-		CompoundTag tag = ItemHelper.getOrCreateComponent(item, AllDataComponents.TOOLBOX, new CompoundTag());
 
 		CompoundTag inv = blockEntityOptional.map(tb -> tb.inventory.serializeNBT())
 			.orElse(new CompoundTag());
-		tag.put("Inventory", inv);
+		java.util.UUID uid = blockEntityOptional.map(ToolboxBlockEntity::getUniqueId).orElse(null);
+		item.set(AllDataComponents.TOOLBOX_INVENTORY, inv);
+		if (uid != null)
+			item.set(AllDataComponents.TOOLBOX_UUID, uid);
 
-		blockEntityOptional.map(tb -> tb.getUniqueId())
-			.ifPresent(uid -> tag.putUUID("UniqueId", uid));
 		blockEntityOptional.map(ToolboxBlockEntity::getCustomName)
 			.ifPresent(arg -> item.set(DataComponents.CUSTOM_NAME, arg));
 		return item;

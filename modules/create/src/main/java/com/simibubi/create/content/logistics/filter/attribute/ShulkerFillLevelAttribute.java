@@ -7,15 +7,14 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import com.simibubi.create.Create;
 import com.simibubi.create.content.logistics.filter.ItemAttribute;
 import com.simibubi.create.foundation.utility.Lang;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 
@@ -90,23 +89,28 @@ public class ShulkerFillLevelAttribute implements ItemAttribute {
 		public boolean canApply(ItemStack testStack) {
 			if (!isShulker(testStack))
 				return false;
-			CompoundTag compoundnbt = testStack.has(DataComponents.BLOCK_ENTITY_DATA) ? testStack.get(DataComponents.BLOCK_ENTITY_DATA).getUnsafe() : new CompoundTag();
-			//CompoundTag compoundnbt = testStack.getTagElement("BlockEntityTag");
-			if (compoundnbt == null)
-				return requiredSize.test(0);
-			if (compoundnbt.contains("LootTable", 8))
-				return false;
-			if (compoundnbt.contains("Items", 9)) {
-				int rawSize = compoundnbt.getList("Items", 10).size();
-				if (rawSize < 27)
-					return requiredSize.test(rawSize);
 
-				NonNullList<ItemStack> inventory = NonNullList.withSize(27, ItemStack.EMPTY);
-				ContainerHelper.loadAllItems(compoundnbt, inventory, Create.getRegistryAccess());
-				boolean isFull = inventory.stream().allMatch(itemStack -> !itemStack.isEmpty() && itemStack.getCount() == itemStack.getMaxStackSize());
-				return requiredSize.test(isFull ? Integer.MAX_VALUE : rawSize);
+			ItemContainerContents contents = testStack.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
+			NonNullList<ItemStack> inventory = NonNullList.withSize(27, ItemStack.EMPTY);
+			contents.copyInto(inventory);
+
+			int filledSlots = 0;
+			boolean allFull = true;
+			for (ItemStack slot : inventory) {
+				if (!slot.isEmpty()) {
+					filledSlots++;
+					if (slot.getCount() < slot.getMaxStackSize())
+						allFull = false;
+				} else {
+					allFull = false;
+				}
 			}
-			return requiredSize.test(0);
+
+			if (filledSlots == 0)
+				return requiredSize.test(0);
+			if (allFull && filledSlots == 27)
+				return requiredSize.test(Integer.MAX_VALUE);
+			return requiredSize.test(filledSlots);
 		}
 	}
 }

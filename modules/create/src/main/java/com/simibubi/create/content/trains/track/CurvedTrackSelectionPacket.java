@@ -7,14 +7,11 @@ import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.content.trains.graph.EdgePointType;
 import com.simibubi.create.content.trains.track.TrackTargetingBlockItem.OverlapResult;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.networking.BlockEntityConfigurationPacket;
 import com.simibubi.create.foundation.utility.Lang;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -62,9 +59,11 @@ public class CurvedTrackSelectionPacket extends BlockEntityConfigurationPacket<T
 			.getItem(slot);
 		if (!(stack.getItem() instanceof TrackTargetingBlockItem))
 			return;
-		if (player.isShiftKeyDown() && stack.has(AllDataComponents.TRACK_TARGETING)) {
+		if (player.isShiftKeyDown() && stack.has(AllDataComponents.TRACK_TARGETING_POS)) {
 			player.displayClientMessage(Lang.translateDirect("track_target.clear"), true);
-			stack.remove(AllDataComponents.TRACK_TARGETING);
+			stack.remove(AllDataComponents.TRACK_TARGETING_POS);
+			stack.remove(AllDataComponents.TRACK_TARGETING_DIRECTION);
+			stack.remove(AllDataComponents.TRACK_TARGETING_BEZIER);
 			AllSoundEvents.CONTROLLER_CLICK.play(player.level(), null, pos, 1, .5f);
 			return;
 		}
@@ -81,15 +80,9 @@ public class CurvedTrackSelectionPacket extends BlockEntityConfigurationPacket<T
 			return;
 		}
 
-		CompoundTag stackTag = ItemHelper.getOrCreateComponent(stack, AllDataComponents.TRACK_TARGETING, new CompoundTag());
-		stackTag.put("SelectedPos", NbtUtils.writeBlockPos(pos));
-		stackTag.putBoolean("SelectedDirection", front);
-
-		CompoundTag bezierNbt = new CompoundTag();
-		bezierNbt.putInt("Segment", segment);
-		bezierNbt.put("Key", NbtUtils.writeBlockPos(targetPos));
-		bezierNbt.putBoolean("FromStack", true);
-		stackTag.put("Bezier", bezierNbt);
+		stack.set(AllDataComponents.TRACK_TARGETING_POS, pos);
+		stack.set(AllDataComponents.TRACK_TARGETING_DIRECTION, front);
+		stack.set(AllDataComponents.TRACK_TARGETING_BEZIER, new BezierTrackPointLocation(targetPos, segment));
 
 		player.displayClientMessage(Lang.translateDirect("track_target.set"), true);
 		AllSoundEvents.CONTROLLER_CLICK.play(player.level(), null, pos, 1, 1);

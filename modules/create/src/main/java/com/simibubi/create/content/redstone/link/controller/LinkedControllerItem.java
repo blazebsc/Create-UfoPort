@@ -28,6 +28,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LecternBlock;
@@ -117,9 +118,14 @@ public class LinkedControllerItem extends Item implements MenuProvider, UseFirst
 		ItemStackHandler newInv = new ItemStackHandler(12);
 		if (AllItems.LINKED_CONTROLLER.get() != stack.getItem())
 			throw new IllegalArgumentException("Cannot get frequency items from non-controller: " + stack);
-		CompoundTag invNBT = stack.getOrDefault(AllDataComponents.FILTER_DATA, new CompoundTag()).getCompound("Items");
-		if (!invNBT.isEmpty())
-			newInv.deserializeNBT(invNBT);
+		if (stack.has(AllDataComponents.LINKED_CONTROLLER_ITEMS))
+			com.simibubi.create.foundation.item.ItemHelper.fillItemStackHandler(
+				stack.getOrDefault(AllDataComponents.LINKED_CONTROLLER_ITEMS, ItemContainerContents.EMPTY), newInv);
+		else {
+			CompoundTag invNBT = stack.getOrDefault(AllDataComponents.FILTER_DATA, new CompoundTag()).getCompound("Items");
+			if (!invNBT.isEmpty())
+				newInv.deserializeNBT(invNBT);
+		}
 		return newInv;
 	}
 

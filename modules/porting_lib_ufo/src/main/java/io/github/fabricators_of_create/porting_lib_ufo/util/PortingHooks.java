@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import io.github.fabricators_of_create.porting_lib_ufo.entity.events.EntityEvents;
 import io.github.fabricators_of_create.porting_lib_ufo.event.common.BlockEvents;
 import io.github.fabricators_of_create.porting_lib_ufo.event.common.GrindstoneEvents;
-import io.github.fabricators_of_create.porting_lib_ufo.extensions.extensions.BlockItemExtensions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -108,11 +107,6 @@ public class PortingHooks {
 			}
 			return true;
 		});
-		//RegistryEntryRemovedCallback.event(BuiltInRegistries.ITEM).register((rawId, id, item) -> {
-			//if (item instanceof BlockItemExtensions blockItem) {
-				//blockItem.removeFromBlockToItemMap(Item.BY_BLOCK, item);
-			//}
-		//});
 	}
 
 	/**

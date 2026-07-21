@@ -39,7 +39,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -312,9 +311,7 @@ public class BlueprintOverlayRenderer {
 
 	private static ItemStack[] getItemsMatchingFilter(ItemStack filter) {
 		return cachedRenderedFilters.computeIfAbsent(filter, itemStack -> {
-			CompoundTag tag = ItemHelper.getOrCreateComponent(itemStack, AllDataComponents.FILTER_DATA, new CompoundTag());
-
-			if (AllItems.FILTER.isIn(itemStack) && !tag.getBoolean("Blacklist")) {
+			if (AllItems.FILTER.isIn(itemStack) && !itemStack.getOrDefault(AllDataComponents.FILTER_ITEMS_BLACKLIST, false)) {
 				ItemStackHandler filterItems = FilterItem.getFilterItems(itemStack);
 				List<ItemStack> list = new ArrayList<>();
 				for (int slot = 0; slot < filterItems.getSlotCount(); slot++) {
@@ -326,10 +323,16 @@ public class BlueprintOverlayRenderer {
 			}
 
 			if (AllItems.ATTRIBUTE_FILTER.isIn(itemStack)) {
-				WhitelistMode whitelistMode = WhitelistMode.values()[tag.getInt("WhitelistMode")];
-				ListTag attributes = tag.getList("MatchedAttributes", net.minecraft.nbt.Tag.TAG_COMPOUND);
+				WhitelistMode whitelistMode = itemStack.getOrDefault(AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE,
+					WhitelistMode.WHITELIST_DISJ);
+				List<CompoundTag> attributes = itemStack.getOrDefault(AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES, List.of());
+				if (attributes.isEmpty() && itemStack.has(AllDataComponents.FILTER_DATA)) {
+					CompoundTag tag = itemStack.getOrDefault(AllDataComponents.FILTER_DATA, new CompoundTag());
+					attributes = tag.getList("MatchedAttributes", net.minecraft.nbt.Tag.TAG_COMPOUND)
+						.stream().map(CompoundTag.class::cast).toList();
+				}
 				if (whitelistMode == WhitelistMode.WHITELIST_DISJ && attributes.size() == 1) {
-					ItemAttribute fromNBT = ItemAttribute.fromNBT((CompoundTag) attributes.get(0));
+					ItemAttribute fromNBT = ItemAttribute.fromNBT(attributes.get(0));
 					if (fromNBT instanceof ItemAttribute.InTag inTag) {
 						List<ItemStack> stacks = new ArrayList<>();
 						for (Holder<Item> holder : BuiltInRegistries.ITEM.getTagOrEmpty(inTag.tag)) {

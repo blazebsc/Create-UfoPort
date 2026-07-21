@@ -2304,6 +2304,8 @@
   "create.portal_track.blocked": "Target location blocked (%1$s,%2$s,%3$s)",
   "create.portal_track.failed": "Cannot place portal track:",
   "create.portal_track.missing": "Target portal not generated yet",
+  "create.pokemon_seat.select": "Click to Seat",
+  "create.pokemon_seat.title": "Assign Pokemon to Seat",
   "create.potato_cannon.ammo.attack_damage": "%1$s Attack Damage",
   "create.potato_cannon.ammo.knockback": "%1$s Knockback",
   "create.potato_cannon.ammo.reload_ticks": "%1$s Reload Ticks",

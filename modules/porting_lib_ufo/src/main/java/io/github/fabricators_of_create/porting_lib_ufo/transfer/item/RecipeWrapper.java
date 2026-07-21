@@ -10,8 +10,6 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.Container;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
 
@@ -28,11 +26,6 @@ public class RecipeWrapper extends ItemStackHandler implements RecipeInput {
 		this.handler = handler;
 	}
 
-//	@Override
-//	public int getContainerSize() {
-//		return handler.getSlotCount();
-//	}
-
 	@Override
 	public boolean isEmpty() {
 		return handler.empty();
@@ -44,42 +37,9 @@ public class RecipeWrapper extends ItemStackHandler implements RecipeInput {
 		return handler.getStackInSlot(index);
 	}
 
-//	@Override
-//	@NotNull
-//	public ItemStack removeItem(int index, int count) {
-//		if (index >= 0 && index < handler.getSlotCount()) {
-//			ItemStack current = handler.getStackInSlot(index);
-//			if (current.isEmpty())
-//				return ItemStack.EMPTY;
-//			current = current.copy();
-//			ItemStack extracted = current.split(count);
-//			handler.setStackInSlot(index, current);
-//			return extracted;
-//		}
-//		return ItemStack.EMPTY;
-//	}
-//
-//	@Override
-//	@NotNull
-//	public ItemStack removeItemNoUpdate(int index) {
-//		return removeItem(index, Integer.MAX_VALUE);
-//	}
-//
 	public void setItem(int index, @NotNull ItemStack stack) {
 		handler.setStackInSlot(index, stack);
 	}
-//
-//	@Override
-//	public void clearContent() {
-//		handler.setSize(handler.getSlotCount());
-//	}
-//
-//	@Override
-//	public int getMaxStackSize() { return 0; }
-//	@Override
-//	public void setChanged() {}
-//	@Override
-//	public boolean stillValid(@NotNull Player player) { return false; }
 
 	@Override
 	public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {

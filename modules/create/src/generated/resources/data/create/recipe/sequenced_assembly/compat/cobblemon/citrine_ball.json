@@ -1,0 +1,88 @@
+{
+  "fabric:load_conditions": [
+    { "condition": "fabric:all_mods_loaded", "values": ["cobblemon"] }
+  ],
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "tag": "c:ingots/copper"
+  },
+  "loops": 1,
+  "results": [
+    {
+      "chance": 120.0,
+      "count": 4,
+      "id": "cobblemon:citrine_ball"
+    },
+    {
+      "chance": 8.0,
+      "id": "create:copper_sheet"
+    },
+    {
+      "chance": 5.0,
+      "id": "minecraft:copper_ingot"
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "create:copper_sheet"
+        }
+      ],
+      "results": [
+        {
+          "id": "create:copper_sheet"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "create:copper_sheet"
+        },
+        {
+          "item": "cobblemon:yellow_apricorn"
+        }
+      ],
+      "results": [
+        {
+          "id": "create:copper_sheet"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "create:copper_sheet"
+        },
+        {
+          "item": "cobblemon:yellow_apricorn"
+        }
+      ],
+      "results": [
+        {
+          "id": "create:copper_sheet"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "create:copper_sheet"
+        }
+      ],
+      "results": [
+        {
+          "id": "create:copper_sheet"
+        }
+      ]
+    }
+  ],
+  "transitionalItem": {
+    "id": "create:copper_sheet"
+  }
+}

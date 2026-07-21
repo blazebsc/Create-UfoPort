@@ -1,9 +1,5 @@
 package com.simibubi.create.content.kinetics.steamEngine;
 
-import java.util.Locale;
-
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -11,9 +7,9 @@ import com.simibubi.create.AllParticleTypes;
 import com.simibubi.create.foundation.particle.ICustomParticleDataWithSprite;
 
 import net.minecraft.client.particle.ParticleEngine.SpriteParticleRegistration;
+import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -32,21 +28,6 @@ public class SteamJetParticleData implements ParticleOptions, ICustomParticleDat
 		SteamJetParticleData::new
 	);
 
-//	public static final ParticleOptions.Deserializer<SteamJetParticleData> DESERIALIZER =
-//		new ParticleOptions.Deserializer<SteamJetParticleData>() {
-//			public SteamJetParticleData fromCommand(ParticleType<SteamJetParticleData> particleTypeIn,
-//				StringReader reader) throws CommandSyntaxException {
-//				reader.expect(' ');
-//				float speed = reader.readFloat();
-//				return new SteamJetParticleData(speed);
-//			}
-//
-//			public SteamJetParticleData fromNetwork(ParticleType<SteamJetParticleData> particleTypeIn,
-//				FriendlyByteBuf buffer) {
-//				return new SteamJetParticleData(buffer.readFloat());
-//			}
-//		};
-
 	float speed;
 
 	public SteamJetParticleData(float speed) {
@@ -62,24 +43,30 @@ public class SteamJetParticleData implements ParticleOptions, ICustomParticleDat
 		return AllParticleTypes.STEAM_JET.get();
 	}
 
-//	@Override
-//	public void writeToNetwork(FriendlyByteBuf buffer) {
-//		buffer.writeFloat(speed);
-//	}
-//
-//	@Override
-//	public String writeToString() {
-//		return String.format(Locale.ROOT, "%s %f", AllParticleTypes.STEAM_JET.parameter(), speed);
-//	}
-//
-//	@Override
-//	public Deserializer<SteamJetParticleData> getDeserializer() {
-//		return DESERIALIZER;
-//	}
-
 	@Override
 	public MapCodec<SteamJetParticleData> getCodec(ParticleType<SteamJetParticleData> type) {
 		return CODEC;
+	}
+
+	@Override
+	public ParticleType<SteamJetParticleData> createType() {
+		SteamJetParticleData self = this;
+		return new ParticleType<SteamJetParticleData>(false) {
+			@Override
+			public MapCodec<SteamJetParticleData> codec() {
+				return self.getCodec(this);
+			}
+			@Override
+			public StreamCodec<? super RegistryFriendlyByteBuf, SteamJetParticleData> streamCodec() {
+				return self.getStreamCodec(this);
+			}
+		};
+	}
+
+	@Override
+	@Environment(EnvType.CLIENT)
+	public ParticleProvider<SteamJetParticleData> getFactory() {
+		throw new IllegalAccessError("This particle type uses a metaFactory!");
 	}
 
 	@Override

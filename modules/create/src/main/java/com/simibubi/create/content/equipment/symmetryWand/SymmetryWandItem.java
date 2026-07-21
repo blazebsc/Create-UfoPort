@@ -11,12 +11,11 @@ import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.AllPackets;
 import com.simibubi.create.content.contraptions.mounted.CartAssemblerBlock;
-import com.simibubi.create.content.equipment.symmetryWand.mirror.CrossPlaneMirror;
 import com.simibubi.create.content.equipment.symmetryWand.mirror.EmptyMirror;
+import com.simibubi.create.content.equipment.symmetryWand.mirror.CrossPlaneMirror;
 import com.simibubi.create.content.equipment.symmetryWand.mirror.PlaneMirror;
 import com.simibubi.create.content.equipment.symmetryWand.mirror.SymmetryMirror;
 import com.simibubi.create.foundation.gui.ScreenOpener;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.utility.BlockHelper;
 import com.simibubi.create.foundation.utility.Iterate;
 import com.simibubi.create.infrastructure.config.AllConfigs;
@@ -27,7 +26,6 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -82,13 +80,11 @@ public class SymmetryWandItem extends Item {
 		if (context.getLevel().isClientSide || context.getHand() != InteractionHand.MAIN_HAND)
 			return InteractionResult.SUCCESS;
 
-		CompoundTag compound = wand.getOrDefault(AllDataComponents.SYM_WAND, new CompoundTag()).getCompound(SYMMETRY);
+		SymmetryMirror previousElement = wand.get(AllDataComponents.SYM_WAND);
+
 		pos = pos.relative(context.getClickedFace());
-		SymmetryMirror previousElement = SymmetryMirror.fromNBT(compound);
 
 		// No Shift -> Make / Move Mirror
-		ItemHelper.getOrCreateComponent(wand, AllDataComponents.SYM_WAND, new CompoundTag())
-			.putBoolean(ENABLE, true);
 		Vec3 pos3d = new Vec3(pos.getX(), pos.getY(), pos.getZ());
 		SymmetryMirror newElement = new PlaneMirror(pos3d);
 
@@ -98,9 +94,6 @@ public class SymmetryWandItem extends Item {
 					? PlaneMirror.Align.XY.ordinal()
 					: PlaneMirror.Align.YZ.ordinal());
 			newElement.enable = true;
-			ItemHelper.getOrCreateComponent(wand, AllDataComponents.SYM_WAND, new CompoundTag())
-				.putBoolean(ENABLE, true);
-
 		} else {
 			previousElement.setPosition(pos3d);
 
@@ -122,14 +115,13 @@ public class SymmetryWandItem extends Item {
 			newElement = previousElement;
 		}
 
-		compound = newElement.writeToNbt();
-		ItemHelper.getOrCreateComponent(wand, AllDataComponents.SYM_WAND, new CompoundTag())
-			.put(SYMMETRY, compound);
-		
+		wand.set(AllDataComponents.SYM_WAND, newElement);
+		wand.set(AllDataComponents.SYM_WAND_ENABLE, true);
+
 		player.setItemInHand(context.getHand(), wand);
 		AllPackets.getChannel().sendToClient(
 				new UpdateSymmetryWandPacket(InteractionHand.MAIN_HAND, newElement), (ServerPlayer)player);
-		
+
 		return InteractionResult.SUCCESS;
 	}
 
@@ -151,8 +143,7 @@ public class SymmetryWandItem extends Item {
 		}
 
 		// No Shift -> Clear Mirror
-		ItemHelper.getOrCreateComponent(wand, AllDataComponents.SYM_WAND, new CompoundTag())
-			.putBoolean(ENABLE, false);
+		wand.set(AllDataComponents.SYM_WAND_ENABLE, false);
 		return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, wand);
 	}
 
@@ -162,32 +153,29 @@ public class SymmetryWandItem extends Item {
 	}
 
 	private static void checkNBT(ItemStack wand) {
-		if (!wand.has(AllDataComponents.SYM_WAND) || !wand.get(AllDataComponents.SYM_WAND)
-			.contains(SYMMETRY)) {
-			wand.set(AllDataComponents.SYM_WAND, new CompoundTag());
-			wand.get(AllDataComponents.SYM_WAND)
-				.put(SYMMETRY, new EmptyMirror(new Vec3(0, 0, 0)).writeToNbt());
-			wand.get(AllDataComponents.SYM_WAND)
-				.putBoolean(ENABLE, false);
+		if (!wand.has(AllDataComponents.SYM_WAND)) {
+			wand.set(AllDataComponents.SYM_WAND, new EmptyMirror(Vec3.ZERO));
 		}
+		if (!wand.has(AllDataComponents.SYM_WAND_ENABLE))
+			wand.set(AllDataComponents.SYM_WAND_ENABLE, wand.get(AllDataComponents.SYM_WAND).enable);
+		if (!wand.has(AllDataComponents.SYM_WAND_SIMULATE))
+			wand.set(AllDataComponents.SYM_WAND_SIMULATE, false);
 	}
 
 	public static boolean isEnabled(ItemStack stack) {
 		checkNBT(stack);
-		CompoundTag tag = stack.getOrDefault(AllDataComponents.SYM_WAND, new CompoundTag());
-		return tag.getBoolean(ENABLE) && !tag.getBoolean("Simulate");
+		return stack.getOrDefault(AllDataComponents.SYM_WAND_ENABLE, false)
+			&& !stack.getOrDefault(AllDataComponents.SYM_WAND_SIMULATE, false);
 	}
 
 	public static SymmetryMirror getMirror(ItemStack stack) {
 		checkNBT(stack);
-		return SymmetryMirror.fromNBT(stack.getOrDefault(AllDataComponents.SYM_WAND, new CompoundTag())
-			.getCompound(SYMMETRY));
+		return stack.get(AllDataComponents.SYM_WAND);
 	}
 
 	public static void configureSettings(ItemStack stack, SymmetryMirror mirror) {
 		checkNBT(stack);
-		ItemHelper.getOrCreateComponent(stack, AllDataComponents.SYM_WAND, new CompoundTag())
-			.put(SYMMETRY, mirror.writeToNbt());
+		stack.set(AllDataComponents.SYM_WAND, mirror);
 	}
 
 	public static void apply(Level world, ItemStack wand, Player player, BlockPos pos, BlockState block) {
@@ -199,8 +187,7 @@ public class SymmetryWandItem extends Item {
 
 		Map<BlockPos, BlockState> blockSet = new HashMap<>();
 		blockSet.put(pos, block);
-		SymmetryMirror symmetry = SymmetryMirror.fromNBT((CompoundTag) ItemHelper.getOrCreateComponent(wand, AllDataComponents.SYM_WAND, new CompoundTag())
-			.getCompound(SYMMETRY));
+		SymmetryMirror symmetry = wand.get(AllDataComponents.SYM_WAND);
 
 		Vec3 mirrorPos = symmetry.getPosition();
 		if (mirrorPos.distanceTo(Vec3.atLowerCornerOf(pos)) > AllConfigs.server().equipment.maxSymmetryWandRange.get())
@@ -253,10 +240,9 @@ public class SymmetryWandItem extends Item {
 				world.setBlock(position, ifluidstate.createLegacyBlock(), Block.UPDATE_KNOWN_SHAPE);
 				world.setBlockAndUpdate(position, blockState);
 
-				CompoundTag wandNbt = ItemHelper.getOrCreateComponent(wand, AllDataComponents.SYM_WAND, new CompoundTag());
-				wandNbt.putBoolean("Simulate", true);
+				wand.set(AllDataComponents.SYM_WAND_SIMULATE, true);
 				boolean placeInterrupted = !world.isUnobstructed(cachedState, position, CollisionContext.empty());//ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP);
-				wandNbt.putBoolean("Simulate", false);
+				wand.set(AllDataComponents.SYM_WAND_SIMULATE, false);
 
 				if (placeInterrupted) {
 //					blocksnapshot.restore(true, false);
@@ -283,8 +269,7 @@ public class SymmetryWandItem extends Item {
 
 		Map<BlockPos, BlockState> blockSet = new HashMap<>();
 		blockSet.put(pos, air);
-		SymmetryMirror symmetry = SymmetryMirror.fromNBT((CompoundTag) ItemHelper.getOrCreateComponent(wand, AllDataComponents.SYM_WAND, new CompoundTag())
-			.getCompound(SYMMETRY));
+		SymmetryMirror symmetry = wand.get(AllDataComponents.SYM_WAND);
 
 		Vec3 mirrorPos = symmetry.getPosition();
 		if (mirrorPos.distanceTo(Vec3.atLowerCornerOf(pos)) > AllConfigs.server().equipment.maxSymmetryWandRange.get())

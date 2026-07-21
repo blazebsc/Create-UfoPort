@@ -2,11 +2,9 @@ package com.simibubi.create.content.logistics.filter;
 
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.AllMenuTypes;
-import com.simibubi.create.foundation.item.ItemHelper;
 
 import io.github.fabricators_of_create.porting_lib_ufo.transfer.item.ItemStackHandler;
 import io.github.fabricators_of_create.porting_lib_ufo.transfer.item.SlotItemHandler;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
@@ -56,17 +54,23 @@ public class FilterMenu extends AbstractFilterMenu {
 	@Override
 	protected void initAndReadInventory(ItemStack filterItem) {
 		super.initAndReadInventory(filterItem);
-		CompoundTag tag = filterItem.getOrDefault(AllDataComponents.FILTER_DATA, new CompoundTag());
-		respectNBT = tag.getBoolean("RespectNBT");
-		blacklist = tag.getBoolean("Blacklist");
+		respectNBT = filterItem.getOrDefault(AllDataComponents.FILTER_ITEMS_RESPECT_NBT, false);
+		blacklist = filterItem.getOrDefault(AllDataComponents.FILTER_ITEMS_BLACKLIST, false);
 	}
 
 	@Override
 	protected void saveData(ItemStack filterItem) {
 		super.saveData(filterItem);
-		CompoundTag tag = ItemHelper.getOrCreateComponent(filterItem, AllDataComponents.FILTER_DATA, new CompoundTag());
-		tag.putBoolean("RespectNBT", respectNBT);
-		tag.putBoolean("Blacklist", blacklist);
+
+		if (respectNBT)
+			filterItem.set(AllDataComponents.FILTER_ITEMS_RESPECT_NBT, true);
+		else
+			filterItem.remove(AllDataComponents.FILTER_ITEMS_RESPECT_NBT);
+
+		if (blacklist)
+			filterItem.set(AllDataComponents.FILTER_ITEMS_BLACKLIST, true);
+		else
+			filterItem.remove(AllDataComponents.FILTER_ITEMS_BLACKLIST);
 
 		if (respectNBT || blacklist)
 			return;
@@ -74,7 +78,7 @@ public class FilterMenu extends AbstractFilterMenu {
 			if (!ghostInventory.getStackInSlot(i)
 				.isEmpty())
 				return;
-		filterItem.remove(AllDataComponents.FILTER_DATA);
+		filterItem.remove(AllDataComponents.FILTER_ITEMS);
 	}
 
 }

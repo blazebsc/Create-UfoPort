@@ -5,9 +5,7 @@ import java.util.function.Predicate;
 
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.AllPackets;
-import com.simibubi.create.foundation.item.ItemHelper;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -36,8 +34,7 @@ public class ShootableGadgetItemMethods {
 	}
 
 	public static boolean shouldSwap(Player player, ItemStack item, InteractionHand hand, Predicate<ItemStack> predicate) {
-		boolean isSwap = item.getOrDefault(AllDataComponents.ZAPPER, new CompoundTag())
-			.contains("_Swap");
+		boolean isSwap = item.getOrDefault(AllDataComponents.SHAPER_SWAP, false);
 		boolean mainHand = hand == InteractionHand.MAIN_HAND;
 		boolean gunInOtherHand = predicate.test(player.getItemInHand(mainHand ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND));
 
@@ -45,14 +42,11 @@ public class ShootableGadgetItemMethods {
 		if (mainHand && isSwap && gunInOtherHand)
 			return true;
 		if (mainHand && !isSwap && gunInOtherHand)
-			ItemHelper.getOrCreateComponent(item, AllDataComponents.ZAPPER, new CompoundTag())
-				.putBoolean("_Swap", true);
+			item.set(AllDataComponents.SHAPER_SWAP, true);
 		if (!mainHand && isSwap)
-			ItemHelper.getOrCreateComponent(item, AllDataComponents.ZAPPER, new CompoundTag())
-				.remove("_Swap");
+			item.remove(AllDataComponents.SHAPER_SWAP);
 		if (!mainHand && gunInOtherHand)
-			ItemHelper.getOrCreateComponent(player.getItemInHand(InteractionHand.MAIN_HAND), AllDataComponents.ZAPPER, new CompoundTag())
-				.remove("_Swap");
+			player.getItemInHand(InteractionHand.MAIN_HAND).remove(AllDataComponents.SHAPER_SWAP);
 
 		// (#574) fabric: on forge, this condition is patched into startUsingItem
 		// skipping it causes an item to be used forever, only allowing 1 use before releasing and re-pressing the use button.

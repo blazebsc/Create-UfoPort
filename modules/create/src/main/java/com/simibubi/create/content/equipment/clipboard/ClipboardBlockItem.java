@@ -2,9 +2,7 @@ package com.simibubi.create.content.equipment.clipboard;
 
 import javax.annotation.Nonnull;
 
-import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.foundation.gui.ScreenOpener;
-import com.simibubi.create.foundation.item.ItemHelper;
 
 import io.github.fabricators_of_create.porting_lib_ufo.transfer.item.ItemHandlerHelper;
 import io.github.fabricators_of_create.porting_lib_ufo.util.EnvExecutor;
@@ -63,7 +61,7 @@ public class ClipboardBlockItem extends BlockItem {
 			.addCooldown(heldItem.getItem(), 10);
 		if (world.isClientSide)
 			EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> openScreen(player, heldItem));
-		CompoundTag tag = ItemHelper.getOrCreateComponent(heldItem, AllDataComponents.CLIPBOARD_EDITING, new CompoundTag());
+		CompoundTag tag = ClipboardData.getOrCreate(heldItem);
 		tag.putInt("Type", ClipboardOverrides.ClipboardType.EDITING.ordinal());
 
 		return InteractionResultHolder.success(heldItem);

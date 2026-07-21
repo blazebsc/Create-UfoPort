@@ -24,7 +24,8 @@ public class FilterItemStack {
 	private FluidStack filterFluidStack;
 
 	public static FilterItemStack of(ItemStack filter) {
-		if (filter.has(AllDataComponents.FILTER_DATA)) {
+		if (filter.has(AllDataComponents.FILTER_ITEMS) || filter.has(AllDataComponents.FILTER_DATA)
+			|| filter.has(AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES)) {
 			if (AllItems.FILTER.isIn(filter))
 				return new ListFilterItemStack(filter);
 			if (AllItems.ATTRIBUTE_FILTER.isIn(filter))
@@ -121,7 +122,6 @@ public class FilterItemStack {
 
 		protected ListFilterItemStack(ItemStack filter) {
 			super(filter);
-			boolean defaults = !filter.has(AllDataComponents.FILTER_DATA);
 
 			containedItems = new ArrayList<>();
 			ItemStackHandler items = FilterItem.getFilterItems(filter);
@@ -131,12 +131,8 @@ public class FilterItemStack {
 					containedItems.add(FilterItemStack.of(stackInSlot));
 			}
 
-			shouldRespectNBT = !defaults ? false
-				: filter.get(AllDataComponents.FILTER_DATA)
-					.getBoolean("RespectNBT");
-			isBlacklist = defaults ? false
-				: filter.get(AllDataComponents.FILTER_DATA)
-					.getBoolean("Blacklist");
+			shouldRespectNBT = filter.getOrDefault(AllDataComponents.FILTER_ITEMS_RESPECT_NBT, false);
+			isBlacklist = filter.getOrDefault(AllDataComponents.FILTER_ITEMS_BLACKLIST, false);
 		}
 
 		@Override
@@ -170,18 +166,26 @@ public class FilterItemStack {
 
 		protected AttributeFilterItemStack(ItemStack filter) {
 			super(filter);
-			boolean defaults = !filter.has(AllDataComponents.FILTER_DATA);
+			boolean defaults = !filter.has(AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE)
+				&& !filter.has(AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES)
+				&& !filter.has(AllDataComponents.FILTER_DATA);
 
 			attributeTests = new ArrayList<>();
-			whitelistMode = WhitelistMode.values()[defaults ? 0
-				: filter.get(AllDataComponents.FILTER_DATA)
+			if (defaults) {
+				whitelistMode = WhitelistMode.WHITELIST_DISJ;
+			} else if (filter.has(AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE)) {
+				whitelistMode = WhitelistMode.values()[filter.get(AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE).ordinal()];
+			} else {
+				whitelistMode = WhitelistMode.values()[filter.getOrDefault(AllDataComponents.FILTER_DATA, new CompoundTag())
 					.getInt("WhitelistMode")];
+			}
 
-			ListTag attributes = defaults ? new ListTag()
-				: filter.get(AllDataComponents.FILTER_DATA)
-					.getList("MatchedAttributes", Tag.TAG_COMPOUND);
-			for (Tag inbt : attributes) {
-				CompoundTag compound = (CompoundTag) inbt;
+			List<CompoundTag> attributes = filter.getOrDefault(AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES, List.of());
+			if (attributes.isEmpty() && filter.has(AllDataComponents.FILTER_DATA)) {
+				ListTag oldList = filter.get(AllDataComponents.FILTER_DATA).getList("MatchedAttributes", Tag.TAG_COMPOUND);
+				attributes = oldList.stream().map(CompoundTag.class::cast).toList();
+			}
+			for (CompoundTag compound : attributes) {
 				ItemAttribute attribute = ItemAttribute.fromNBT(compound);
 				if (attribute != null)
 					attributeTests.add(Pair.of(attribute, compound.getBoolean("Inverted")));

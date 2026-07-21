@@ -90,14 +90,9 @@ public abstract class PlayerMixin extends LivingEntity {
 			),
 			at = @At(value = "STORE", opcode = Opcodes.ISTORE), index = 9
 	)
-	private boolean modifyResult(boolean value, @Share("original") LocalBooleanRef vanilla) {
+	private boolean port_lib$captureVanillaCrit(boolean value, @Share("original") LocalBooleanRef vanilla) {
 		vanilla.set(value);
-		return true;
-	}
-
-	@ModifyVariable(method = "attack", at = @At(value = "CONSTANT", args = "floatValue=1.5F"), index = 8)
-	private boolean modifyVanillaResult(boolean value, @Share("original") LocalBooleanRef vanilla) {
-		return vanilla.get();
+		return value;
 	}
 
 	@ModifyExpressionValue(method = "attack", at = @At(value = "CONSTANT", args = "floatValue=1.5F"))

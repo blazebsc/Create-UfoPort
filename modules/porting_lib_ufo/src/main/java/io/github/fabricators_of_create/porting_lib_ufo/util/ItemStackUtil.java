@@ -2,7 +2,6 @@ package io.github.fabricators_of_create.porting_lib_ufo.util;
 
 import java.util.Arrays;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 
 public class ItemStackUtil {
@@ -37,6 +36,5 @@ public class ItemStackUtil {
 		if (first.isEmpty() || !ItemStack.isSameItem(first, second) || !ItemStack.isSameItemSameComponents(first, second)) return false;
 		
 		return ItemStack.isSameItemSameComponents(first, second);
-		//return !first.hasTag() || first.getTag().equals(second.getTag());
 	}
 }

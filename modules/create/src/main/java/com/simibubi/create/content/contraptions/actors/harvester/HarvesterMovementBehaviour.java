@@ -25,6 +25,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.CocoaBlock;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.GrowingPlantBlock;
@@ -95,7 +96,10 @@ public class HarvesterMovementBehaviour implements MovementBehaviour {
 			effectChance = .45f;
 		}
 
-		MutableBoolean seedSubtracted = new MutableBoolean(notCropButCuttable);
+		BlockState cutCrop = cutCrop(world, pos, stateVisited);
+		boolean blockResetsInPlace = !cutCrop.isAir() && cutCrop.getBlock() == stateVisited.getBlock();
+
+		MutableBoolean seedSubtracted = new MutableBoolean(notCropButCuttable || blockResetsInPlace);
 		BlockState state = stateVisited;
 		BlockHelper.destroyBlockAs(world, pos, null, item, effectChance, stack -> {
 			if (AllConfigs.server().kinetics.harvesterReplants.get() && !seedSubtracted.getValue()
@@ -107,7 +111,6 @@ public class HarvesterMovementBehaviour implements MovementBehaviour {
 				dropItem(context, stack);
 		});
 
-		BlockState cutCrop = cutCrop(world, pos, stateVisited);
 		world.setBlockAndUpdate(pos, cutCrop.canSurvive(world, pos) ? cutCrop : Blocks.AIR.defaultBlockState());
 	}
 
@@ -123,7 +126,7 @@ public class HarvesterMovementBehaviour implements MovementBehaviour {
 		}
 
 		if (state.getCollisionShape(world, pos)
-			.isEmpty() || state.getBlock() instanceof CocoaBlock) {
+			.isEmpty() || state.getBlock() instanceof CocoaBlock || state.getBlock() instanceof BonemealableBlock) {
 			for (Property<?> property : state.getProperties()) {
 				if (!(property instanceof IntegerProperty))
 					continue;
@@ -201,7 +204,7 @@ public class HarvesterMovementBehaviour implements MovementBehaviour {
 				.createLegacyBlock();
 		}
 		if (state.getCollisionShape(world, pos)
-			.isEmpty() || block instanceof CocoaBlock) {
+			.isEmpty() || block instanceof CocoaBlock || block instanceof BonemealableBlock) {
 			for (Property<?> property : state.getProperties()) {
 				if (!(property instanceof IntegerProperty))
 					continue;

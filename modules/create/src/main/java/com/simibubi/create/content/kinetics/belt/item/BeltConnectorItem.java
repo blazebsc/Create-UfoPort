@@ -15,7 +15,6 @@ import com.simibubi.create.content.kinetics.simpleRelays.AbstractSimpleShaftBloc
 import com.simibubi.create.content.kinetics.simpleRelays.ShaftBlock;
 import com.simibubi.create.foundation.advancement.AllAdvancements;
 import com.simibubi.create.foundation.block.ProperWaterloggedBlock;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.utility.VecHelper;
 import com.simibubi.create.infrastructure.config.AllConfigs;
 
@@ -23,9 +22,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
-import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
@@ -54,7 +50,7 @@ public class BeltConnectorItem extends BlockItem {
 	public InteractionResult useOn(UseOnContext context) {
 		Player playerEntity = context.getPlayer();
 		if (playerEntity != null && playerEntity.isShiftKeyDown()) {
-			ItemHelper.clearComponents(context.getItemInHand());
+			context.getItemInHand().remove(AllDataComponents.FIRST_PULLEY);
 			return InteractionResult.SUCCESS;
 		}
 
@@ -65,8 +61,6 @@ public class BeltConnectorItem extends BlockItem {
 		if (world.isClientSide)
 			return validAxis ? InteractionResult.SUCCESS : InteractionResult.FAIL;
 
-		//CompoundTag tag = context.getItemInHand()
-				//.getOrCreateTag();
 		BlockPos firstPulley = null;
 
 		// Remove first if no longer existant or valid
@@ -74,9 +68,6 @@ public class BeltConnectorItem extends BlockItem {
 			firstPulley = context.getItemInHand().get(AllDataComponents.FIRST_PULLEY);
 			if (!validateAxis(world, firstPulley) || !firstPulley.closerThan(pos, maxLength() * 2)) {
 				context.getItemInHand().remove(AllDataComponents.FIRST_PULLEY);
-//				tag.remove("FirstPulley");
-//				context.getItemInHand()
-//						.setTag(tag);
 			}
 		}
 
@@ -98,7 +89,7 @@ public class BeltConnectorItem extends BlockItem {
 
 			if (!context.getItemInHand()
 					.isEmpty()) {
-				ItemHelper.clearComponents(context.getItemInHand());
+				context.getItemInHand().remove(AllDataComponents.FIRST_PULLEY);
 				playerEntity.getCooldowns()
 						.addCooldown(this, 5);
 			}

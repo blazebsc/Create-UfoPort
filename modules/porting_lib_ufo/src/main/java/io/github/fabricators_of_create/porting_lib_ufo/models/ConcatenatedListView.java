@@ -1,6 +1,5 @@
 package io.github.fabricators_of_create.porting_lib_ufo.models;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 
@@ -95,12 +94,16 @@ public class ConcatenatedListView<T> implements List<T> {
 	@NotNull
 	@Override
 	public Iterator<T> iterator() {
-		return Iterables.unmodifiableIterable(Iterables.concat(lists)).iterator();
+		return lists.stream()
+			.<T>flatMap(Collection::stream)
+			.iterator();
 	}
 
 	@Override
 	public Spliterator<T> spliterator() {
-		return Iterables.unmodifiableIterable(Iterables.concat(lists)).spliterator();
+		return lists.stream()
+			.<T>flatMap(Collection::stream)
+			.spliterator();
 	}
 
 	// Delegate to a concatenated collection

@@ -1939,7 +1939,8 @@ public class AllBlocks {
 					.add(LootItem.lootTableItem(block)
 						.apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
 						.apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
-							.include(AllDataComponents.TOOLBOX)))));
+							.include(AllDataComponents.TOOLBOX_UUID)
+							.include(AllDataComponents.TOOLBOX_INVENTORY)))));
 //						.apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY)
 //							.copy("UniqueId", "UniqueId"))
 //						.apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY)

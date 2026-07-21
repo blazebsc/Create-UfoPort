@@ -109,9 +109,6 @@ public class FluidBucketWrapper implements SingleSlotStorage<FluidVariant> {
 	public ItemStack getFilledBucket(@NotNull FluidStack fluidStack) {
 		Fluid fluid = fluidStack.getFluid();
 
-		//if (!fluidStack.hasTag() || fluidStack.getTag().isEmpty()) {
-		//	
-		//}
 		if (fluid == Fluids.WATER) {
 			return new ItemStack(Items.WATER_BUCKET);
 		} else if (fluid == Fluids.LAVA) {

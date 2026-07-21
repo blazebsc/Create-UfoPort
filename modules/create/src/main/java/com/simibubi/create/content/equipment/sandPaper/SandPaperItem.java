@@ -8,18 +8,15 @@ import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.Create;
 import com.simibubi.create.foundation.item.CustomUseEffectsItem;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.mixin.accessor.LivingEntityAccessor;
 import com.simibubi.create.foundation.utility.VecHelper;
 
 import io.github.fabricators_of_create.porting_lib_ufo.mixin.accessors.common.accessor.AxeItemAccessor;
-import io.github.fabricators_of_create.porting_lib_ufo.util.NBTSerializer;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -56,9 +53,8 @@ public class SandPaperItem extends Item implements CustomUseEffectsItem {
 	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
 		ItemStack itemstack = playerIn.getItemInHand(handIn);
 		InteractionResultHolder<ItemStack> FAIL = new InteractionResultHolder<>(InteractionResult.FAIL, itemstack);
-		
-		if (itemstack.has(AllDataComponents.POLISHING) 
-				&& itemstack.get(AllDataComponents.POLISHING).contains("Polishing")) {
+
+		if (itemstack.has(AllDataComponents.POLISHING)) {
 			playerIn.startUsingItem(handIn);
 			return new InteractionResultHolder<>(InteractionResult.PASS, itemstack);
 		}
@@ -70,9 +66,8 @@ public class SandPaperItem extends Item implements CustomUseEffectsItem {
 			ItemStack item = itemInOtherHand.copy();
 			ItemStack toPolish = item.split(1);
 			playerIn.startUsingItem(handIn);
-			ItemHelper.getOrCreateComponent(itemstack, AllDataComponents.POLISHING, new CompoundTag())
-				.put("Polishing", NBTSerializer.serializeNBT(toPolish));
-				
+			itemstack.set(AllDataComponents.POLISHING, new SandPaperItemComponent(toPolish, false));
+
 			playerIn.setItemInHand(otherHand, item);
 			return new InteractionResultHolder<>(InteractionResult.SUCCESS, itemstack);
 		}
@@ -108,8 +103,7 @@ public class SandPaperItem extends Item implements CustomUseEffectsItem {
 		playerIn.startUsingItem(handIn);
 
 		if (!worldIn.isClientSide) {
-			ItemHelper.getOrCreateComponent(itemstack, AllDataComponents.POLISHING, new CompoundTag())
-				.put("Polishing", NBTSerializer.serializeNBT(toPolish));
+			itemstack.set(AllDataComponents.POLISHING, new SandPaperItemComponent(toPolish, false));
 			if (item.isEmpty())
 				pickUp.discard();
 			else
@@ -124,9 +118,8 @@ public class SandPaperItem extends Item implements CustomUseEffectsItem {
 		if (!(entityLiving instanceof Player))
 			return stack;
 		Player player = (Player) entityLiving;
-		CompoundTag tag = ItemHelper.getOrCreateComponent(stack, AllDataComponents.POLISHING, new CompoundTag());
-		if (tag.contains("Polishing")) {
-			ItemStack toPolish = ItemStack.parseOptional(Create.getRegistryAccess(), tag.getCompound("Polishing"));
+		if (stack.has(AllDataComponents.POLISHING)) {
+			ItemStack toPolish = stack.get(AllDataComponents.POLISHING).item();
 			ItemStack polished =
 				SandPaperPolishingRecipe.applyPolish(worldIn, entityLiving.position(), toPolish, stack);
 
@@ -146,7 +139,7 @@ public class SandPaperItem extends Item implements CustomUseEffectsItem {
 						.placeItemBackInInventory(polished);
 				}
 			}
-			tag.remove("Polishing");
+			stack.remove(AllDataComponents.POLISHING);
 			stack.hurtAndBreak(1, entityLiving, player.getUsedItemHand() == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
 		}
 
@@ -166,12 +159,11 @@ public class SandPaperItem extends Item implements CustomUseEffectsItem {
 		if (!(entityLiving instanceof Player))
 			return;
 		Player player = (Player) entityLiving;
-		CompoundTag tag = ItemHelper.getOrCreateComponent(stack, AllDataComponents.POLISHING, new CompoundTag());
-		if (tag.contains("Polishing")) {
-			ItemStack toPolish = ItemStack.parseOptional(Create.getRegistryAccess(), tag.getCompound("Polishing"));
+		if (stack.has(AllDataComponents.POLISHING)) {
+			ItemStack toPolish = stack.get(AllDataComponents.POLISHING).item();
 			player.getInventory()
 				.placeItemBackInInventory(toPolish);
-			tag.remove("Polishing");
+			stack.remove(AllDataComponents.POLISHING);
 		}
 	}
 
@@ -223,9 +215,8 @@ public class SandPaperItem extends Item implements CustomUseEffectsItem {
 
 	@Override
 	public boolean triggerUseEffects(ItemStack stack, LivingEntity entity, int count, RandomSource random) {
-		CompoundTag tag = ItemHelper.getOrCreateComponent(stack, AllDataComponents.POLISHING, new CompoundTag());
-		if (tag.contains("Polishing")) {
-			ItemStack polishing = ItemStack.parseOptional(Create.getRegistryAccess(), tag.getCompound("Polishing"));
+		if (stack.has(AllDataComponents.POLISHING)) {
+			ItemStack polishing = stack.get(AllDataComponents.POLISHING).item();
 			((LivingEntityAccessor) entity).create$callSpawnItemParticles(polishing, 1);
 		}
 

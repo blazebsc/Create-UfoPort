@@ -448,13 +448,10 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
 		if (uniqueId == null)
 			uniqueId = UUID.randomUUID();
 
-		CompoundTag compound = new CompoundTag();
-		compound.put("Inventory", inventory.serializeNBT());
-		compound.putUUID("UniqueId", uniqueId);
-		
 		DataComponentPatch.Builder builder = DataComponentPatch.builder();
 		super.components().forEach(type -> builder.set((DataComponentType)type.type(), type.value()));
-		builder.set(AllDataComponents.TOOLBOX, compound);
+		builder.set(AllDataComponents.TOOLBOX_INVENTORY, inventory.serializeNBT());
+		builder.set(AllDataComponents.TOOLBOX_UUID, uniqueId);
 		super.applyComponents(super.components(), builder.build());
 	}
 

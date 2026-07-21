@@ -11,7 +11,6 @@ import com.simibubi.create.content.trains.track.TrackBlockOutline.BezierPointSel
 import com.simibubi.create.content.trains.track.TrackTargetingBehaviour.RenderedTrackOverlayType;
 import com.simibubi.create.content.trains.track.TrackTargetingBlockItem.OverlapResult;
 import com.simibubi.create.foundation.render.SuperRenderTypeBuffer;
-import com.simibubi.create.foundation.utility.NbtFixer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -19,8 +18,6 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.AxisDirection;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -56,20 +53,17 @@ public class TrackTargetingClient {
 			Create.RAILWAYS.sided(null)
 				.tickSignalOverlay();
 
-		boolean alreadySelected = stack.has(AllDataComponents.TRACK_TARGETING) && stack.get(AllDataComponents.TRACK_TARGETING)
-			.contains("SelectedPos");
+		boolean alreadySelected = stack.has(AllDataComponents.TRACK_TARGETING_POS);
 
 		if (type != null) {
 			BezierPointSelection bezierSelection = TrackBlockOutline.result;
 
 			if (alreadySelected) {
-				CompoundTag tag = stack.get(AllDataComponents.TRACK_TARGETING);
-				hovered = NbtFixer.readBlockPos(tag, "SelectedPos");
-				direction = tag.getBoolean("SelectedDirection");
-				if (tag.contains("Bezier")) {
-					CompoundTag bezierNbt = tag.getCompound("Bezier");
-					BlockPos key = NbtFixer.readBlockPos(bezierNbt, "Key");
-					hoveredBezier = new BezierTrackPointLocation(key, bezierNbt.getInt("Segment"));
+				hovered = stack.get(AllDataComponents.TRACK_TARGETING_POS);
+				direction = stack.getOrDefault(AllDataComponents.TRACK_TARGETING_DIRECTION, false);
+				if (stack.has(AllDataComponents.TRACK_TARGETING_BEZIER)) {
+					BezierTrackPointLocation bezierLoc = stack.get(AllDataComponents.TRACK_TARGETING_BEZIER);
+					hoveredBezier = bezierLoc;
 				}
 
 			} else if (bezierSelection != null) {

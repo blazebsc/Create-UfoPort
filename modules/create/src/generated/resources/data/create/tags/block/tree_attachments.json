@@ -5,6 +5,13 @@
     "minecraft:mangrove_propagule",
     "minecraft:moss_carpet",
     "minecraft:shroomlight",
-    "minecraft:vine"
+    "minecraft:vine",
+    "cobblemon:red_apricorn",
+    "cobblemon:blue_apricorn",
+    "cobblemon:yellow_apricorn",
+    "cobblemon:green_apricorn",
+    "cobblemon:pink_apricorn",
+    "cobblemon:white_apricorn",
+    "cobblemon:black_apricorn"
   ]
 }

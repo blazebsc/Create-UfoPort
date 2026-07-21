@@ -13,10 +13,8 @@ import com.simibubi.create.foundation.utility.RegisteredObjects;
 
 import io.github.fabricators_of_create.porting_lib_ufo.util.TagUtil;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.FireworkRocketItem;
 import net.minecraft.world.item.FireworkStarItem;
@@ -43,8 +41,6 @@ public class ColorAttribute implements ItemAttribute {
 	}
 
 	private Collection<DyeColor> findMatchingDyeColors(ItemStack stack) {
-		//CompoundTag nbt = stack.getTag();
-
 		DyeColor color = TagUtil.getColorFromStack(stack);
 		if (color != null)
 			return Collections.singletonList(color);
@@ -52,10 +48,6 @@ public class ColorAttribute implements ItemAttribute {
 		final Set<DyeColor> colors = new HashSet<>();
 		if (stack.getItem() instanceof FireworkRocketItem && stack.has(DataComponents.FIREWORKS)) {
 			stack.get(DataComponents.FIREWORKS).explosions().forEach(obj -> colors.addAll(getFireworkStarColors(obj)));
-//			ListTag listnbt = nbt.getCompound("Fireworks").getList("Explosions", 10);
-//			for (int i = 0; i < listnbt.size(); i++) {
-//				colors.addAll(getFireworkStarColors(listnbt.getCompound(i)));
-//			}
 		}
 
 		if (stack.getItem() instanceof FireworkStarItem && stack.has(DataComponents.FIREWORK_EXPLOSION)) {
@@ -71,9 +63,6 @@ public class ColorAttribute implements ItemAttribute {
 		final Set<DyeColor> colors = new HashSet<>();
 		compound.colors().forEach(cnt -> colors.add(DyeColor.byFireworkColor(cnt)));
 		compound.fadeColors().forEach(cnt -> colors.add(DyeColor.byFireworkColor(cnt)));
-		
-//		Arrays.stream(compound.getIntArray("Colors")).mapToObj(DyeColor::byFireworkColor).forEach(colors::add);
-//		Arrays.stream(compound.getIntArray("FadeColors")).mapToObj(DyeColor::byFireworkColor).forEach(colors::add);
 		return colors;
 	}
 

@@ -4,9 +4,7 @@
     {
       "amount": 2025,
       "components": {
-        "create:bottle_type": {
-          "Bottle": "REGULAR"
-        },
+        "create:bottle_type": "regular",
         "minecraft:potion_contents": {
           "potion": "minecraft:night_vision"
         }

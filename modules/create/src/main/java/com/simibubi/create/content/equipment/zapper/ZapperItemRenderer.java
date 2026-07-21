@@ -10,9 +10,8 @@ import com.simibubi.create.foundation.item.render.PartialItemModelRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
+
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -25,15 +24,13 @@ public abstract class ZapperItemRenderer extends CustomRenderedItemModelRenderer
 	protected void render(ItemStack stack, CustomRenderedItemModel model, PartialItemModelRenderer renderer, ItemDisplayContext transformType,
 		PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
 		// Block indicator
-		if (transformType == ItemDisplayContext.GUI && stack.has(AllDataComponents.ZAPPER) && stack.get(AllDataComponents.ZAPPER)
-			.contains("BlockUsed"))
+		if (transformType == ItemDisplayContext.GUI && stack.has(AllDataComponents.SHAPER_BLOCK_USED))
 			renderBlockUsed(stack, ms, buffer, light, overlay);
 	}
 
 	@SuppressWarnings("deprecation")
 	private void renderBlockUsed(ItemStack stack, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
-		BlockState state = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), stack.getOrDefault(AllDataComponents.ZAPPER, new CompoundTag())
-			.getCompound("BlockUsed"));
+		BlockState state = stack.getOrDefault(AllDataComponents.SHAPER_BLOCK_USED, Blocks.AIR.defaultBlockState());
 
 		ms.pushPose();
 		ms.translate(-0.3F, -0.45F, -0.0F);

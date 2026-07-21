@@ -1,0 +1,22 @@
+{
+  "fabric:load_conditions": [
+    { "condition": "fabric:all_mods_loaded", "values": ["cobblemon"] }
+  ],
+  "type": "create:crushing",
+  "ingredients": [
+    {
+      "item": "cobblemon:black_tumblestone_cluster"
+    }
+  ],
+  "processingTime": 200,
+  "results": [
+    {
+      "count": 4,
+      "id": "cobblemon:black_tumblestone"
+    },
+    {
+      "chance": 0.25,
+      "id": "cobblemon:black_tumblestone"
+    }
+  ]
+}

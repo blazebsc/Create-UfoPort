@@ -8,14 +8,10 @@ import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.AllSpecialTextures;
 import com.simibubi.create.CreateClient;
-import com.simibubi.create.foundation.item.ItemHelper;
-import com.simibubi.create.foundation.utility.NBTHelper;
-import com.simibubi.create.foundation.utility.NbtFixer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.ClipContext.Block;
@@ -48,33 +44,31 @@ public class WorldshaperRenderHandler {
 		boolean zapperInOff = AllItems.WORLDSHAPER.isIn(heldOff);
 
 		if (zapperInMain) {
-			CompoundTag tag = ItemHelper.getOrCreateComponent(heldMain, AllDataComponents.ZAPPER, new CompoundTag());
-			if (!tag.contains("_Swap") || !zapperInOff) {
-				createBrushOutline(tag, player, heldMain);
+			boolean isSwap = heldMain.getOrDefault(AllDataComponents.SHAPER_SWAP, false);
+			if (!isSwap || !zapperInOff) {
+				createBrushOutline(heldMain, player);
 				return;
 			}
 		}
 
 		if (zapperInOff) {
-			CompoundTag tag = ItemHelper.getOrCreateComponent(heldOff, AllDataComponents.ZAPPER, new CompoundTag());
-			createBrushOutline(tag, player, heldOff);
+			createBrushOutline(heldOff, player);
 			return;
 		}
 
 		renderedPositions = null;
 	}
 
-	public static void createBrushOutline(CompoundTag tag, LocalPlayer player, ItemStack zapper) {
-		if (!tag.contains("BrushParams")) {
+	public static void createBrushOutline(ItemStack zapper, LocalPlayer player) {
+		if (!zapper.has(AllDataComponents.SHAPER_BRUSH_PARAMS)) {
 			renderedPositions = null;
 			return;
 		}
 
-		Brush brush = NBTHelper.readEnum(tag, "Brush", TerrainBrushes.class)
-			.get();
-		PlacementOptions placement = NBTHelper.readEnum(tag, "Placement", PlacementOptions.class);
-		TerrainTools tool = NBTHelper.readEnum(tag, "Tool", TerrainTools.class);
-		BlockPos params = NbtFixer.readBlockPos(tag, "BrushParams");
+		Brush brush = zapper.getOrDefault(AllDataComponents.SHAPER_BRUSH, TerrainBrushes.Cuboid).get();
+		PlacementOptions placement = zapper.getOrDefault(AllDataComponents.SHAPER_PLACEMENT_OPTIONS, PlacementOptions.Merged);
+		TerrainTools tool = zapper.getOrDefault(AllDataComponents.SHAPER_TOOL, TerrainTools.Fill);
+		BlockPos params = zapper.get(AllDataComponents.SHAPER_BRUSH_PARAMS);
 		brush.set(params.getX(), params.getY(), params.getZ());
 
 		Vec3 start = player.position()

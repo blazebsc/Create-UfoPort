@@ -26,12 +26,6 @@ public abstract class TransformationMixin implements TransformationExtensions {
 	@Unique
 	private Matrix3f normalTransform = null;
 
-	@Override
-	public Matrix3f getNormalMatrix() {
-		port_lib$checkNormalTransform();
-		return normalTransform;
-	}
-
 	@Unique
 	private void port_lib$checkNormalTransform() {
 		if (normalTransform == null) {
@@ -39,6 +33,24 @@ public abstract class TransformationMixin implements TransformationExtensions {
 			normalTransform.invert();
 			normalTransform.transpose();
 		}
+	}
+
+	@Override
+	public Transformation applyOrigin(Vector3f origin) {
+		if (isIdentity()) return Transformation.identity();
+
+		Matrix4f ret = this.getMatrix();
+		Matrix4f tmp = new Matrix4f().translation(origin.x(), origin.y(), origin.z());
+		tmp.mul(ret, ret);
+		tmp.translation(-origin.x(), -origin.y(), -origin.z());
+		ret.mul(tmp);
+		return new Transformation(ret);
+	}
+
+	@Override
+	public Matrix3f getNormalMatrix() {
+		port_lib$checkNormalTransform();
+		return normalTransform;
 	}
 
 	@Override
@@ -52,14 +64,23 @@ public abstract class TransformationMixin implements TransformationExtensions {
 	}
 
 	@Override
-	public Transformation applyOrigin(Vector3f origin) {
-		if (isIdentity()) return Transformation.identity();
+	public boolean isIdentity() {
+		return this.equals(Transformation.identity());
+	}
 
-		Matrix4f ret = this.getMatrix();
-		Matrix4f tmp = new Matrix4f().translation(origin.x(), origin.y(), origin.z());
-		tmp.mul(ret, ret);
-		tmp.translation(-origin.x(), -origin.y(), -origin.z());
-		ret.mul(tmp);
-		return new Transformation(ret);
+	@Override
+	public void transformNormal(Vector3f normal) {
+		normal.mul(getNormalMatrix());
+		normal.normalize();
+	}
+
+	@Override
+	public Transformation blockCenterToCorner() {
+		return applyOrigin(new Vector3f(.5f, .5f, .5f));
+	}
+
+	@Override
+	public Transformation blockCornerToCenter() {
+		return applyOrigin(new Vector3f(-.5f, -.5f, -.5f));
 	}
 }

@@ -1,9 +1,5 @@
 package com.simibubi.create.foundation.particle;
 
-import java.util.Locale;
-
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -12,9 +8,9 @@ import com.simibubi.create.AllParticleTypes;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.ParticleEngine.SpriteParticleRegistration;
+import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -33,23 +29,7 @@ public class AirParticleData implements ParticleOptions, ICustomParticleDataWith
 		AirParticleData::new
 	); 
 	
-//	public static final ParticleOptions.Deserializer<AirParticleData> DESERIALIZER =
-//		new ParticleOptions.Deserializer<AirParticleData>() {
-//			public AirParticleData fromCommand(ParticleType<AirParticleData> particleTypeIn, StringReader reader)
-//				throws CommandSyntaxException {
-//				reader.expect(' ');
-//				float drag = reader.readFloat();
-//				reader.expect(' ');
-//				float speed = reader.readFloat();
-//				return new AirParticleData(drag, speed);
-//			}
-//
-//			public AirParticleData fromNetwork(ParticleType<AirParticleData> particleTypeIn, FriendlyByteBuf buffer) {
-//				return new AirParticleData(buffer.readFloat(), buffer.readFloat());
-//			}
-//		};
-
-	float drag; 
+	float drag;
 	float speed;
 
 	public AirParticleData(float drag, float speed) {
@@ -66,25 +46,30 @@ public class AirParticleData implements ParticleOptions, ICustomParticleDataWith
 		return AllParticleTypes.AIR.get();
 	}
 
-//	@Override
-//	public void writeToNetwork(FriendlyByteBuf buffer) {
-//		buffer.writeFloat(drag);
-//		buffer.writeFloat(speed);
-//	}
-
-//	@Override
-//	public String writeToString() {
-//		return String.format(Locale.ROOT, "%s %f %f", AllParticleTypes.AIR.parameter(), drag, speed);
-//	}
-
-//	@Override
-//	public Deserializer<AirParticleData> getDeserializer() {
-//		return DESERIALIZER;
-//	}
-
 	@Override
 	public MapCodec<AirParticleData> getCodec(ParticleType<AirParticleData> type) {
 		return CODEC;
+	}
+
+	@Override
+	public ParticleType<AirParticleData> createType() {
+		AirParticleData self = this;
+		return new ParticleType<AirParticleData>(false) {
+			@Override
+			public MapCodec<AirParticleData> codec() {
+				return self.getCodec(this);
+			}
+			@Override
+			public StreamCodec<? super RegistryFriendlyByteBuf, AirParticleData> streamCodec() {
+				return self.getStreamCodec(this);
+			}
+		};
+	}
+
+	@Override
+	@Environment(EnvType.CLIENT)
+	public ParticleProvider<AirParticleData> getFactory() {
+		throw new IllegalAccessError("This particle type uses a metaFactory!");
 	}
 
 	@Override

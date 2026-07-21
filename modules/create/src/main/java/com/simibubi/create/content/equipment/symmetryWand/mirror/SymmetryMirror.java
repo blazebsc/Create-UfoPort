@@ -6,15 +6,19 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 import com.jozufozu.flywheel.core.PartialModel;
+import com.mojang.serialization.Codec;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.foundation.utility.Lang;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.FloatTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
@@ -32,6 +36,12 @@ public abstract class SymmetryMirror {
 	public static final String PLANE = "plane";
 	public static final String CROSS_PLANE = "cross_plane";
 	public static final String TRIPLE_PLANE = "triple_plane";
+
+	public static final Codec<SymmetryMirror> CODEC =
+		CompoundTag.CODEC.xmap(SymmetryMirror::fromNBT, SymmetryMirror::writeToNbt);
+
+	public static final StreamCodec<ByteBuf, SymmetryMirror> STREAM_CODEC =
+		ByteBufCodecs.COMPOUND_TAG.map(SymmetryMirror::fromNBT, SymmetryMirror::writeToNbt);
 
 	protected Vec3 position;
 	protected StringRepresentable orientation;

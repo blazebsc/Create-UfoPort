@@ -3,7 +3,6 @@ package com.simibubi.create.content.processing.sequenced;
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.foundation.utility.Color;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -16,11 +15,7 @@ public class SequencedAssemblyItem extends Item {
 	public float getProgress(ItemStack stack) {
 		if (!stack.has(AllDataComponents.SEQUENCED_ASSEMBLY))
 			return 0;
-		CompoundTag tag = stack.get(AllDataComponents.SEQUENCED_ASSEMBLY);
-		if (!tag.contains("SequencedAssembly"))
-			return 0;
-		return tag.getCompound("SequencedAssembly")
-			.getFloat("Progress");
+		return stack.get(AllDataComponents.SEQUENCED_ASSEMBLY).progress();
 	}
 
 	@Override

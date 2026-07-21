@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Set;
 
 import com.jozufozu.flywheel.util.Color;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.AllSpecialTextures;
 import com.simibubi.create.AllTags;
@@ -18,7 +20,6 @@ import com.simibubi.create.foundation.utility.BlockHelper;
 import com.simibubi.create.foundation.utility.Couple;
 import com.simibubi.create.foundation.utility.Iterate;
 import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.NbtFixer;
 import com.simibubi.create.foundation.utility.Pair;
 import com.simibubi.create.foundation.utility.VecHelper;
 import com.simibubi.create.foundation.utility.animation.LerpedFloat;
@@ -26,6 +27,7 @@ import com.simibubi.create.foundation.utility.animation.LerpedFloat.Chaser;
 import com.simibubi.create.infrastructure.config.AllConfigs;
 
 import io.github.fabricators_of_create.porting_lib_ufo.transfer.item.ItemHandlerHelper;
+import io.netty.buffer.ByteBuf;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
@@ -36,7 +38,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
@@ -55,6 +59,35 @@ import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
 
 public class TrackPlacement {
+
+	public record ConnectingFrom(BlockPos pos, Vec3 axis, Vec3 normal, Vec3 end) {
+		public static final Codec<ConnectingFrom> CODEC = RecordCodecBuilder.create(i -> i.group(
+			BlockPos.CODEC.fieldOf("pos").forGetter(ConnectingFrom::pos),
+			Vec3.CODEC.fieldOf("axis").forGetter(ConnectingFrom::axis),
+			Vec3.CODEC.fieldOf("normal").forGetter(ConnectingFrom::normal),
+			Vec3.CODEC.fieldOf("end").forGetter(ConnectingFrom::end)
+		).apply(i, ConnectingFrom::new));
+
+		public static final StreamCodec<ByteBuf, ConnectingFrom> STREAM_CODEC =
+			ByteBufCodecs.COMPOUND_TAG.map(ConnectingFrom::fromTag, ConnectingFrom::toTag);
+
+		private static ConnectingFrom fromTag(CompoundTag tag) {
+			BlockPos pos = NbtUtils.readBlockPos(tag, "pos").orElse(BlockPos.ZERO);
+			Vec3 axis = VecHelper.readNBTCompound(tag.getCompound("axis"));
+			Vec3 normal = VecHelper.readNBTCompound(tag.getCompound("normal"));
+			Vec3 end = VecHelper.readNBTCompound(tag.getCompound("end"));
+			return new ConnectingFrom(pos, axis, normal, end);
+		}
+
+		private CompoundTag toTag() {
+			CompoundTag tag = new CompoundTag();
+			tag.put("pos", NbtUtils.writeBlockPos(pos));
+			tag.put("axis", VecHelper.writeNBTCompound(axis));
+			tag.put("normal", VecHelper.writeNBTCompound(normal));
+			tag.put("end", VecHelper.writeNBTCompound(end));
+			return tag;
+		}
+	}
 
 	public static class PlacementInfo {
 
@@ -131,14 +164,14 @@ public class TrackPlacement {
 		Vec3 normedAxis2 = axis2.normalize();
 		Vec3 end2 = track.getCurveStart(level, pos2, state2, axis2);
 
-		CompoundTag itemTag = stack.getOrDefault(AllDataComponents.TRACK_ITEM, new CompoundTag());
-		CompoundTag selectionTag = itemTag.getCompound("ConnectingFrom");
-		BlockPos pos1 = NbtFixer.readBlockPos(selectionTag, "Pos");
-		Vec3 axis1 = VecHelper.readNBT(selectionTag.getList("Axis", Tag.TAG_DOUBLE));
+		ConnectingFrom connectingFrom = stack.get(AllDataComponents.TRACK_CONNECTING_FROM);
+
+		BlockPos pos1 = connectingFrom.pos();
+		Vec3 axis1 = connectingFrom.axis();
 		Vec3 normedAxis1 = axis1.normalize();
-		Vec3 end1 = VecHelper.readNBT(selectionTag.getList("End", Tag.TAG_DOUBLE));
-		Vec3 normal1 = VecHelper.readNBT(selectionTag.getList("Normal", Tag.TAG_DOUBLE));
-		boolean front1 = selectionTag.getBoolean("Front");
+		Vec3 end1 = connectingFrom.end();
+		Vec3 normal1 = connectingFrom.normal();
+		boolean front1 = false;
 		BlockState state1 = level.getBlockState(pos1);
 
 		if (level.isClientSide) {
@@ -418,7 +451,7 @@ public class TrackPlacement {
 						int remainingItems =
 							count - Math.min(isTrack ? tracks - foundTracks : pavement - foundPavement, count);
 						if (i == inv.selected)
-							stackInSlot.remove(AllDataComponents.TRACK_ITEM);
+							stackInSlot.remove(AllDataComponents.TRACK_CONNECTING_FROM);
 						ItemStack newItem = ItemHandlerHelper.copyStackWithSize(stackInSlot, remainingItems);
 						if (offhand)
 							player.setItemInHand(InteractionHand.OFF_HAND, newItem);

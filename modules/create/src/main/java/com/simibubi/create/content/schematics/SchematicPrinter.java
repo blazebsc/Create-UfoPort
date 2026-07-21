@@ -91,14 +91,14 @@ public class SchematicPrinter {
 	}
 
 	public void loadSchematic(ItemStack blueprint, Level originalWorld, boolean processNBT) {
-		if (!blueprint.has(AllDataComponents.SCHEMATIC_DATA) || !blueprint.get(AllDataComponents.SCHEMATIC_DATA).getBoolean("Deployed"))
+		if (!blueprint.has(AllDataComponents.SCHEMATIC_FILE) || !blueprint.getOrDefault(AllDataComponents.SCHEMATIC_DEPLOYED, false))
 			return;
 
 		StructureTemplate activeTemplate =
 			SchematicItem.loadSchematic(originalWorld.holderLookup(Registries.BLOCK), blueprint);
 		StructurePlaceSettings settings = SchematicItem.getSettings(blueprint, processNBT);
 
-		schematicAnchor = NbtFixer.readBlockPos(blueprint.get(AllDataComponents.SCHEMATIC_DATA), "Anchor");
+		schematicAnchor = blueprint.getOrDefault(AllDataComponents.SCHEMATIC_ANCHOR, BlockPos.ZERO);
 		blockReader = new SchematicWorld(schematicAnchor, originalWorld);
 
 		try {

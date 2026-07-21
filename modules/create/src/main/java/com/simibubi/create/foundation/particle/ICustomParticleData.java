@@ -1,6 +1,5 @@
 package com.simibubi.create.foundation.particle;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 
 import net.fabricmc.api.EnvType;
@@ -15,8 +14,6 @@ import net.minecraft.network.codec.StreamCodec;
 
 public interface ICustomParticleData<T extends ParticleOptions> {
 
-	//Deserializer<T> getDeserializer();
-
 	MapCodec<T> getCodec(ParticleType<T> type);
 	StreamCodec<RegistryFriendlyByteBuf, T> getStreamCodec(ParticleType<T> type);
 
@@ -29,7 +26,7 @@ public interface ICustomParticleData<T extends ParticleOptions> {
 			}
 
 			@Override
-			public StreamCodec<RegistryFriendlyByteBuf, T> streamCodec() {
+			public StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec() {
 				return ICustomParticleData.this.getStreamCodec(this);
 			}
 		};

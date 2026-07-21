@@ -53,7 +53,10 @@ public class ClipboardEditPacket extends SimplePacketBase {
 				if (!targetedBlock.closerThan(sender.blockPosition(), 20))
 					return;
 				if (world.getBlockEntity(targetedBlock) instanceof ClipboardBlockEntity cbe) {
-					cbe.dataContainer.set(AllDataComponents.CLIPBOARD_EDITING, data.isEmpty() ? null : data);
+					if (data.isEmpty())
+						cbe.dataContainer.remove(AllDataComponents.CLIPBOARD_EDITING);
+					else
+						cbe.dataContainer.set(AllDataComponents.CLIPBOARD_EDITING, new ClipboardData(data));
 					cbe.onEditedBy(sender);
 				}
 				return;
@@ -63,7 +66,10 @@ public class ClipboardEditPacket extends SimplePacketBase {
 				.getItem(hotbarSlot);
 			if (!AllBlocks.CLIPBOARD.isIn(itemStack))
 				return;
-			itemStack.set(AllDataComponents.CLIPBOARD_EDITING, data.isEmpty() ? null : data);
+			if (data.isEmpty())
+				itemStack.remove(AllDataComponents.CLIPBOARD_EDITING);
+			else
+				itemStack.set(AllDataComponents.CLIPBOARD_EDITING, new ClipboardData(data));
 		});
 
 		return true;

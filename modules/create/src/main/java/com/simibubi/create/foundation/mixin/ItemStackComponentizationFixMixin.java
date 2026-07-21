@@ -62,8 +62,10 @@ public class ItemStackComponentizationFixMixin {
 		{
 			CompoundTag tag5 = new CompoundTag();
 			itemStackData.removeTag("Items").result().ifPresent(arg -> tag5.put("Items", (Tag)arg.getValue()));
-			itemStackData.removeTag("RespectNBT").result().ifPresent(arg -> tag5.put("RespectNBT", (Tag)arg.getValue()));
-			itemStackData.removeTag("Blacklist").result().ifPresent(arg -> tag5.put("Blacklist", (Tag)arg.getValue()));
+			itemStackData.removeTag("RespectNBT").result().ifPresent(arg ->
+				itemStackData.setComponent("create:filter_items_respect_nbt", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
+			itemStackData.removeTag("Blacklist").result().ifPresent(arg ->
+				itemStackData.setComponent("create:filter_items_blacklist", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
 			itemStackData.removeTag("WhitelistMode").result().ifPresent(arg -> tag5.put("WhitelistMode", (Tag)arg.getValue()));
 			itemStackData.removeTag("MatchedAttributes").result().ifPresent(arg -> tag5.put("MatchedAttributes", (Tag)arg.getValue()));
 			if(!tag5.isEmpty()) itemStackData.setComponent("create:filter_data", new Dynamic(NbtOps.INSTANCE, tag5));
@@ -80,17 +82,31 @@ public class ItemStackComponentizationFixMixin {
 		}
 		
 		if(itemStackData.is("create:sand_paper") || itemStackData.is("create:red_sand_paper")) {
-			CompoundTag tag5 = new CompoundTag();
-			itemStackData.removeTag("Polishing").result().ifPresent(arg -> tag5.put("Polishing", (Tag)arg.getValue()));
-			itemStackData.removeTag("JEI").result().ifPresent(arg -> tag5.put("JEI", (Tag)arg.getValue()));
-			if(!tag5.isEmpty()) itemStackData.setComponent("create:polishing", new Dynamic(NbtOps.INSTANCE, tag5));
+			AtomicBoolean hasData = new AtomicBoolean(false);
+			CompoundTag polishTag = new CompoundTag();
+			itemStackData.removeTag("Polishing").result().ifPresent(arg -> {
+				polishTag.put("item", (Tag)arg.getValue());
+				hasData.set(true);
+			});
+			itemStackData.removeTag("JEI").result().ifPresent(arg -> {
+				polishTag.putBoolean("jei", true);
+				hasData.set(true);
+			});
+			if(hasData.get()) itemStackData.setComponent("create:polishing", new Dynamic(NbtOps.INSTANCE, polishTag));
 		}
 		
 		if(itemStackData.is("create:wand_of_symmetry")) {
-			CompoundTag tag5 = new CompoundTag();
-			itemStackData.removeTag("symmetry").result().ifPresent(arg -> tag5.put("symmetry", (Tag)arg.getValue()));
-			itemStackData.removeTag("enable").result().ifPresent(arg -> tag5.put("enable", (Tag)arg.getValue()));
-			if(!tag5.isEmpty()) itemStackData.setComponent("create:symmetry_wand", new Dynamic(NbtOps.INSTANCE, tag5));
+			CompoundTag symTag = new CompoundTag();
+			AtomicBoolean hasSymData = new AtomicBoolean(false);
+			itemStackData.removeTag("symmetry").result().ifPresent(arg -> {
+				symTag.put("mirror", (Tag)arg.getValue());
+				hasSymData.set(true);
+			});
+			itemStackData.removeTag("enable").result().ifPresent(arg -> {
+				symTag.put("enable", (Tag)arg.getValue());
+				hasSymData.set(true);
+			});
+			if(hasSymData.get()) itemStackData.setComponent("create:symmetry_wand", new Dynamic(NbtOps.INSTANCE, symTag));
 		}
 		
 		boolean isToolbox = false;
@@ -106,58 +122,102 @@ public class ItemStackComponentizationFixMixin {
 		}
 		
 		if(itemStackData.is("create:handheld_worldshaper")) {
-			CompoundTag tag5 = new CompoundTag();
-			itemStackData.removeTag("Brush").result().ifPresent(arg -> tag5.put("Brush", (Tag)arg.getValue()));
-			itemStackData.removeTag("BrushParams").result().ifPresent(arg -> tag5.put("BrushParams", (Tag)arg.getValue()));
-			itemStackData.removeTag("Tool").result().ifPresent(arg -> tag5.put("Tool", (Tag)arg.getValue()));
-			itemStackData.removeTag("Placement").result().ifPresent(arg -> tag5.put("Placement", (Tag)arg.getValue()));
-			itemStackData.removeTag("Pattern").result().ifPresent(arg -> tag5.put("Pattern", (Tag)arg.getValue()));
-			itemStackData.removeTag("BlockUsed").result().ifPresent(arg -> tag5.put("BlockUsed", (Tag)arg.getValue()));
-			itemStackData.removeTag("BlockData").result().ifPresent(arg -> tag5.put("BlockData", (Tag)arg.getValue()));
-			itemStackData.removeTag("_Swap").result().ifPresent(arg -> tag5.put("_Swap", (Tag)arg.getValue()));
-			if(!tag5.isEmpty()) itemStackData.setComponent("create:zapper", new Dynamic(NbtOps.INSTANCE, tag5));
+			// Enum string values: pass through directly as strings for Codec.STRING.xmap codecs
+			itemStackData.removeTag("Pattern").result().ifPresent(arg ->
+				itemStackData.setComponent("create:placement_pattern", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
+			itemStackData.removeTag("Brush").result().ifPresent(arg ->
+				itemStackData.setComponent("create:shaper_brush", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
+			itemStackData.removeTag("Tool").result().ifPresent(arg ->
+				itemStackData.setComponent("create:shaper_tool", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
+			itemStackData.removeTag("Placement").result().ifPresent(arg ->
+				itemStackData.setComponent("create:shaper_placement_options", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
+			// BrushParams: stored as IntArray [x,y,z] via NbtUtils.writeBlockPos, matches BlockPos.CODEC format
+			itemStackData.removeTag("BrushParams").result().ifPresent(arg ->
+				itemStackData.setComponent("create:shaper_brush_params", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
+			// BlockUsed: CompoundTag containing serialized BlockState
+			itemStackData.removeTag("BlockUsed").result().ifPresent(arg ->
+				itemStackData.setComponent("create:shaper_block_used", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
+			// BlockData: CompoundTag containing block entity data
+			itemStackData.removeTag("BlockData").result().ifPresent(arg ->
+				itemStackData.setComponent("create:shaper_block_data", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
+			// _Swap: Boolean
+			itemStackData.removeTag("_Swap").result().ifPresent(arg ->
+				itemStackData.setComponent("create:shaper_swap", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
 		}
 		
-		CompoundTag tag4 = new CompoundTag();
-		itemStackData.removeTag("SequencedAssembly").result().ifPresent(arg -> tag4.put("SequencedAssembly", (Tag)arg.getValue()));
-		if(!tag4.isEmpty()) itemStackData.setComponent("create:sequenced_assembly", new Dynamic(NbtOps.INSTANCE, tag4));
+		itemStackData.removeTag("SequencedAssembly").result().ifPresent(arg -> {
+			CompoundTag oldTag = (CompoundTag) arg.getValue();
+			CompoundTag newTag = new CompoundTag();
+			newTag.putString("id", oldTag.getString("id"));
+			newTag.putInt("step", oldTag.getInt("Step"));
+			newTag.putFloat("progress", oldTag.getFloat("Progress"));
+			itemStackData.setComponent("create:sequenced_assembly", new Dynamic(NbtOps.INSTANCE, newTag));
+		});
 		
 		if(itemStackData.is("create:empty_schematic") ||
 				itemStackData.is("create:schematic_and_quill") ||
 				itemStackData.is("create:schematic") ||
-				itemStackData.is("create:deployer")) 
+				itemStackData.is("create:deployer"))
 		{
-			CompoundTag tag5 = new CompoundTag();
-			itemStackData.removeTag("Deployed").result().ifPresent(arg -> tag5.put("Deployed", (Tag)arg.getValue()));
-			itemStackData.removeTag("Anchor").result().ifPresent(arg -> tag5.put("Anchor", (Tag)arg.getValue()));
-			itemStackData.removeTag("Rotation").result().ifPresent(arg -> tag5.put("Rotation", (Tag)arg.getValue()));
-			itemStackData.removeTag("Mirror").result().ifPresent(arg -> tag5.put("Mirror", (Tag)arg.getValue()));
-			itemStackData.removeTag("File").result().ifPresent(arg -> tag5.put("File", (Tag)arg.getValue()));
-			itemStackData.removeTag("Bounds").result().ifPresent(arg -> tag5.put("Bounds", (Tag)arg.getValue()));
-			itemStackData.removeTag("Owner").result().ifPresent(arg -> tag5.put("Owner", (Tag)arg.getValue()));
-			itemStackData.removeTag("SchematicHash").result().ifPresent(arg -> tag5.put("SchematicHash", (Tag)arg.getValue()));
-			if(!tag5.isEmpty()) itemStackData.setComponent("create:schematic_data", new Dynamic(NbtOps.INSTANCE, tag5));
+			itemStackData.removeTag("Deployed").result().ifPresent(arg ->
+				itemStackData.setComponent("create:schematic_deployed", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
+			itemStackData.removeTag("Owner").result().ifPresent(arg ->
+				itemStackData.setComponent("create:schematic_owner", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
+			itemStackData.removeTag("File").result().ifPresent(arg ->
+				itemStackData.setComponent("create:schematic_file", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
+			itemStackData.removeTag("Anchor").result().ifPresent(arg ->
+				itemStackData.setComponent("create:schematic_anchor", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
+			itemStackData.removeTag("Rotation").result().ifPresent(arg -> {
+				String rotName = ((net.minecraft.nbt.StringTag)arg.getValue()).getAsString();
+				int ordinal = net.minecraft.world.level.block.Rotation.valueOf(rotName).ordinal();
+				itemStackData.setComponent("create:schematic_rotation", new Dynamic(NbtOps.INSTANCE, net.minecraft.nbt.IntTag.valueOf(ordinal)));
+			});
+			itemStackData.removeTag("Mirror").result().ifPresent(arg -> {
+				String mirName = ((net.minecraft.nbt.StringTag)arg.getValue()).getAsString();
+				int ordinal = net.minecraft.world.level.block.Mirror.valueOf(mirName).ordinal();
+				itemStackData.setComponent("create:schematic_mirror", new Dynamic(NbtOps.INSTANCE, net.minecraft.nbt.IntTag.valueOf(ordinal)));
+			});
+			itemStackData.removeTag("Bounds").result().ifPresent(arg ->
+				itemStackData.setComponent("create:schematic_bounds", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
+			itemStackData.removeTag("SchematicHash").result().ifPresent(arg ->
+				itemStackData.setComponent("create:schematic_hash", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
 		}
 		
 		if(itemStackData.is("create:track") ||
-				itemStackData.is("create:fake_track")) 
+				itemStackData.is("create:fake_track"))
 		{
-			CompoundTag tag5 = new CompoundTag();
-			itemStackData.removeTag("ExtendCurve").result().ifPresent(arg -> tag5.put("ExtendCurve", (Tag)arg.getValue()));
-			itemStackData.removeTag("ConnectingFrom").result().ifPresent(arg -> tag5.put("ConnectingFrom", (Tag)arg.getValue()));
-			if(!tag5.isEmpty()) itemStackData.setComponent("create:track_item", new Dynamic(NbtOps.INSTANCE, tag5));
+			itemStackData.removeTag("ExtendCurve").result().ifPresent(arg ->
+				itemStackData.setComponent("create:track_extend_curve", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
+			itemStackData.removeTag("ConnectingFrom").result().ifPresent(arg -> {
+				// Old format keys: Pos, Axis, Normal, End
+				// New ConnectingFrom.CODEC keys: pos, axis, normal, end (same value format)
+				CompoundTag oldTag = (CompoundTag) arg.getValue();
+				CompoundTag newTag = new CompoundTag();
+				if(oldTag.contains("Pos")) newTag.put("pos", oldTag.get("Pos"));
+				if(oldTag.contains("Axis")) newTag.put("axis", oldTag.get("Axis"));
+				if(oldTag.contains("Normal")) newTag.put("normal", oldTag.get("Normal"));
+				if(oldTag.contains("End")) newTag.put("end", oldTag.get("End"));
+				if(!newTag.isEmpty()) itemStackData.setComponent("create:track_connecting_from", new Dynamic(NbtOps.INSTANCE, newTag));
+			});
 		}
 		
 		if(itemStackData.is("create:track_station") ||
 				itemStackData.is("create:track_signal") ||
-				itemStackData.is("create:track_observer") ||
-				itemStackData.is("create:track_signal")) 
+				itemStackData.is("create:track_observer"))
 		{
-			CompoundTag tag5 = new CompoundTag();
-			itemStackData.removeTag("SelectedPos").result().ifPresent(arg -> tag5.put("SelectedPos", (Tag)arg.getValue()));
-			itemStackData.removeTag("SelectedDirection").result().ifPresent(arg -> tag5.put("SelectedDirection", (Tag)arg.getValue()));
-			itemStackData.removeTag("Bezier").result().ifPresent(arg -> tag5.put("Bezier", (Tag)arg.getValue()));
-			if(!tag5.isEmpty()) itemStackData.setComponent("create:track_targeting", new Dynamic(NbtOps.INSTANCE, tag5));
+			itemStackData.removeTag("SelectedPos").result().ifPresent(arg ->
+				itemStackData.setComponent("create:track_targeting_pos", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
+			itemStackData.removeTag("SelectedDirection").result().ifPresent(arg ->
+				itemStackData.setComponent("create:track_targeting_direction", new Dynamic(NbtOps.INSTANCE, arg.getValue())));
+			itemStackData.removeTag("Bezier").result().ifPresent(arg -> {
+				// Old format: {Segment:int, Key:{X,Y,Z}, FromStack:bool}
+				// New BezierTrackPointLocation.CODEC: {curveTarget:[x,y,z], segment:int}
+				CompoundTag oldBezier = (CompoundTag) arg.getValue();
+				CompoundTag newBezier = new CompoundTag();
+				if(oldBezier.contains("Key")) newBezier.put("curveTarget", oldBezier.get("Key"));
+				if(oldBezier.contains("Segment")) newBezier.putInt("segment", oldBezier.getInt("Segment"));
+				itemStackData.setComponent("create:track_targeting_bezier", new Dynamic(NbtOps.INSTANCE, newBezier));
+			});
 		}
 	}
 	

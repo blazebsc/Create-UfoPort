@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.Create;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.utility.NBTHelper;
 
 import io.github.fabricators_of_create.porting_lib_ufo.util.NBTSerializer;
@@ -33,9 +32,10 @@ public class ClipboardEntry {
 	}
 
 	public static List<List<ClipboardEntry>> readAll(ItemStack clipboardItem) {
-		CompoundTag tag = clipboardItem.getOrDefault(AllDataComponents.CLIPBOARD_EDITING, null);
-		if (tag == null)
+		ClipboardData data = clipboardItem.get(AllDataComponents.CLIPBOARD_EDITING);
+		if (data == null || data.isEmpty())
 			return new ArrayList<>();
+		CompoundTag tag = data.tag();
 		return NBTHelper.readCompoundList(tag.getList("Pages", Tag.TAG_COMPOUND), pageTag -> NBTHelper
 			.readCompoundList(pageTag.getList("Entries", Tag.TAG_COMPOUND), ClipboardEntry::readNBT));
 	}
@@ -44,15 +44,15 @@ public class ClipboardEntry {
 		List<List<ClipboardEntry>> pages = ClipboardEntry.readAll(heldItem);
 		if (pages.isEmpty())
 			return new ArrayList<>();
-		int page = heldItem.has(AllDataComponents.CLIPBOARD_EDITING) ? 0
-			: Math.min(heldItem.get(AllDataComponents.CLIPBOARD_EDITING)
-				.getInt("PreviouslyOpenedPage"), pages.size() - 1);
+		ClipboardData data = heldItem.get(AllDataComponents.CLIPBOARD_EDITING);
+		int page = data == null ? 0
+			: Math.min(data.tag().getInt("PreviouslyOpenedPage"), pages.size() - 1);
 		List<ClipboardEntry> entries = pages.get(page);
 		return entries;
 	}
 
 	public static void saveAll(List<List<ClipboardEntry>> entries, ItemStack clipboardItem) {
-		CompoundTag tag = ItemHelper.getOrCreateComponent(clipboardItem, AllDataComponents.CLIPBOARD_EDITING, new CompoundTag());
+		CompoundTag tag = ClipboardData.getOrCreate(clipboardItem);
 		tag.put("Pages", NBTHelper.writeCompoundList(entries, list -> {
 			CompoundTag pageTag = new CompoundTag();
 			pageTag.put("Entries", NBTHelper.writeCompoundList(list, ClipboardEntry::writeNBT));

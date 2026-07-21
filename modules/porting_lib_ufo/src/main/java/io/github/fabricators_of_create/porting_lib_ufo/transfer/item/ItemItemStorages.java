@@ -5,6 +5,9 @@ import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.BundleItem;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
 
 public class ItemItemStorages {
 	public static ItemApiLookup<Storage<ItemVariant>, ContainerItemContext> ITEM =
@@ -19,11 +22,10 @@ public class ItemItemStorages {
 
 	static {
 		ItemItemStorages.ITEM.registerFallback((itemStack, context) -> {
-//			ItemVariant variant = context.getItemVariant();
-//			if (itemStack.getItem() instanceof BlockItem item && item.getBlock() instanceof ShulkerBoxBlock)
-//				return new ShulkerBoxStorage(item, context);
-//			if (variant.getItem() instanceof BundleItem bundle)
-//				return new BundleStorage(bundle, context);
+			if (itemStack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof ShulkerBoxBlock)
+				return new ShulkerBoxStorage(blockItem, context);
+			if (itemStack.getItem() instanceof BundleItem bundle)
+				return new BundleStorage(bundle, context);
 			return null;
 		});
 	}

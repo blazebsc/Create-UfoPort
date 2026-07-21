@@ -11,15 +11,12 @@ import com.simibubi.create.foundation.gui.AllGuiTextures;
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.gui.element.GuiGameElement;
 import com.simibubi.create.foundation.gui.widget.IconButton;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.utility.Components;
 import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.NBTHelper;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
+
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
@@ -52,8 +49,7 @@ public abstract class ZapperScreen extends AbstractSimiScreen {
 		brightColor = 0xFEFEFE;
 		fontColor = AllGuiTextures.FONT_COLOR;
 
-		CompoundTag nbt = ItemHelper.getOrCreateComponent(zapper, AllDataComponents.ZAPPER, new CompoundTag());
-		currentPattern = NBTHelper.readEnum(nbt, "Pattern", PlacementPatterns.class);
+		currentPattern = zapper.getOrDefault(AllDataComponents.PLACEMENT_PATTERN, PlacementPatterns.Solid);
 	}
 
 	@Override
@@ -141,10 +137,8 @@ public abstract class ZapperScreen extends AbstractSimiScreen {
 		ms.scale(20, 20, 20);
 
 		BlockState state = Blocks.AIR.defaultBlockState();
-		if (zapper.has(AllDataComponents.ZAPPER) && zapper.get(AllDataComponents.ZAPPER)
-			.contains("BlockUsed"))
-			state = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), zapper.get(AllDataComponents.ZAPPER)
-				.getCompound("BlockUsed"));
+		if (zapper.has(AllDataComponents.SHAPER_BLOCK_USED))
+			state = zapper.get(AllDataComponents.SHAPER_BLOCK_USED);
 
 		GuiGameElement.of(state)
 			.render(graphics);

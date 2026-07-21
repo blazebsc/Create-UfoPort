@@ -62,5 +62,4 @@ public abstract class EntityMixin implements INBTSerializableCompound {
 			ci.cancel();
 		}
 	}
-
 }

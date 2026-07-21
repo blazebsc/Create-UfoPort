@@ -5,12 +5,10 @@ import java.util.Random;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.simibubi.create.foundation.utility.Pair;
 
 import net.minecraft.core.Holder;
-import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -73,25 +71,18 @@ public class ProcessingOutput {
 		this.stack.setCount(count.isEmpty() ? 1 : count.get());
 		if(tag.isPresent())
 			this.stack.applyComponents(tag.get());
-		//this.stack.setTag(tag.isEmpty() ? new CompoundTag() : tag.get());
 		this.chance = chance.isEmpty() ? 1 : chance.get();
 	}
 
 	public ProcessingOutput(ItemStack stack, float chance) {
 		this.stack = stack;
 		this.chance = chance;
-		if(stack.isEmpty()) {
-			int y = 1;
-		}
 	}
 
 	public ProcessingOutput(Pair<ResourceLocation, Integer> item, float chance) {
 		this.stack = ItemStack.EMPTY;
 		this.compatDatagenOutput = item;
 		this.chance = chance;
-		if(stack.isEmpty()) {
-			int y = 1;
-		}
 	}
 
 	public ItemStack getStack() {
@@ -114,52 +105,6 @@ public class ProcessingOutput {
 		return out;
 	}
 
-//	public JsonElement serialize() {
-//		JsonObject json = new JsonObject();
-//		ResourceLocation resourceLocation = compatDatagenOutput == null ? RegisteredObjects.getKeyOrThrow(stack
-//			.getItem()) : compatDatagenOutput.getFirst();
-//		json.addProperty("item", resourceLocation.toString());
-//		int count = compatDatagenOutput == null ? stack.getCount() : compatDatagenOutput.getSecond();
-//		if (count != 1)
-//			json.addProperty("count", count);
-//		if (stack.hasTag())
-//			json.add("nbt", JsonParser.parseString(stack.getTag()
-//				.toString()));
-//		if (chance != 1)
-//			json.addProperty("chance", chance);
-//		return json;
-//	}
-
-//	public static ProcessingOutput deserialize(JsonElement je) {
-//		if (!je.isJsonObject())
-//			throw new JsonSyntaxException("ProcessingOutput must be a json object");
-//
-//		JsonObject json = je.getAsJsonObject();
-//		String itemId = GsonHelper.getAsString(json, "item");
-//		int count = GsonHelper.getAsInt(json, "count", 1);
-//		float chance = GsonHelper.isValidNode(json, "chance") ? GsonHelper.getAsFloat(json, "chance") : 1;
-//		ItemStack itemstack = new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(itemId)), count);
-//
-//		if (GsonHelper.isValidNode(json, "nbt")) {
-//			try {
-//				JsonElement element = json.get("nbt");
-//				itemstack.setTag(TagParser.parseTag(
-//					element.isJsonObject() ? Create.GSON.toJson(element) : GsonHelper.convertToString(element, "nbt")));
-//			} catch (CommandSyntaxException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//
-//		return new ProcessingOutput(itemstack, chance);
-//	}
-
-//	public void write(FriendlyByteBuf buf) {
-//		buf.writeItem(getStack());
-//		buf.writeFloat(getChance());
-//	}
-//
-//	public static ProcessingOutput read(FriendlyByteBuf buf) {
-//		return new ProcessingOutput(buf.readItem(), buf.readFloat());
-//	}
+	// Serialization is handled by CODEC and STREAM_CODEC defined above.
 
 }

@@ -18,7 +18,6 @@ import com.simibubi.create.content.fluids.potion.PotionFluid.BottleType;
 import com.simibubi.create.content.fluids.potion.PotionFluidHandler;
 import com.simibubi.create.foundation.fluid.FluidHelper;
 import com.simibubi.create.foundation.utility.Iterate;
-import com.simibubi.create.foundation.utility.NBTHelper;
 import com.tterrag.registrate.fabric.SimpleFlowableFluid;
 import com.tterrag.registrate.util.entry.FluidEntry;
 
@@ -38,7 +37,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.item.TooltipFlag;
@@ -181,23 +179,6 @@ public class AllFluids {
 		return null;
 	}
 
-//	/**
-//	 * Removing alpha from tint prevents optifine from forcibly applying biome
-//	 * colors to modded fluids (Makes translucent fluids disappear)
-//	 */
-//	private static class NoColorFluidAttributes extends FluidAttributes {
-//
-//		protected NoColorFluidAttributes(Builder builder, Fluid fluid) {
-//			super(builder, fluid);
-//		}
-//
-//		@Override
-//		public int getColor(BlockAndTintGetter world, BlockPos pos) {
-//			return 0x00ffffff;
-//		}
-//
-//	}
-
 	@Environment(EnvType.CLIENT)
 	public static class PotionFluidVariantRenderHandler implements FluidVariantRenderHandler {
 		@Override
@@ -206,7 +187,6 @@ public class AllFluids {
 			int color = opt == null || opt.isEmpty()
 					? 0 : fluidVariant.getComponents().get(DataComponents.POTION_CONTENTS).get().getColor();
 			return color | 0xff000000;
-			//return PotionUtils.getColor(PotionUtils.getAllEffects(fluidVariant.getNbt())) | 0xff000000;
 		}
 
 		@Override
@@ -229,9 +209,8 @@ public class AllFluids {
 			if(stack.getComponents().get(AllDataComponents.BOTTLE_TYPE).isEmpty())
 				return "create.potion.invalid";
 			PotionContents cont = stack.getComponents().get(DataComponents.POTION_CONTENTS).get();
-			CompoundTag bottleTag = stack.getComponents().get(AllDataComponents.BOTTLE_TYPE).get();
-			ItemLike itemFromBottleType =
-					PotionFluidHandler.itemFromBottleType(NBTHelper.readEnum(bottleTag, "Bottle", BottleType.class));
+			BottleType bottleType = stack.getComponents().get(AllDataComponents.BOTTLE_TYPE).get();
+			ItemLike itemFromBottleType = PotionFluidHandler.itemFromBottleType(bottleType);
 			return Potion.getName(cont.potion(), itemFromBottleType.asItem()
 					.getDescriptionId() + ".effect.");
 		}

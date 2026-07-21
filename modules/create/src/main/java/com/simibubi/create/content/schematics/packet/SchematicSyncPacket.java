@@ -3,12 +3,9 @@ package com.simibubi.create.content.schematics.packet;
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.content.schematics.SchematicInstances;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.networking.SimplePacketBase;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -65,11 +62,10 @@ public class SchematicSyncPacket extends SimplePacketBase {
 			if (!AllItems.SCHEMATIC.isIn(stack)) {
 				return;
 			}
-			CompoundTag tag = ItemHelper.getOrCreateComponent(stack, AllDataComponents.SCHEMATIC_DATA, new CompoundTag());
-			tag.putBoolean("Deployed", deployed);
-			tag.put("Anchor", NbtUtils.writeBlockPos(anchor));
-			tag.putString("Rotation", rotation.name());
-			tag.putString("Mirror", mirror.name());
+			stack.set(AllDataComponents.SCHEMATIC_DEPLOYED, deployed);
+			stack.set(AllDataComponents.SCHEMATIC_ANCHOR, anchor);
+			stack.set(AllDataComponents.SCHEMATIC_ROTATION, rotation);
+			stack.set(AllDataComponents.SCHEMATIC_MIRROR, mirror);
 			SchematicInstances.clearHash(stack);
 		});
 		return true;

@@ -35,6 +35,7 @@ import com.simibubi.create.foundation.recipe.AllIngredients;
 import com.simibubi.create.foundation.utility.AttachedRegistry;
 import com.simibubi.create.infrastructure.command.ServerLagger;
 import com.simibubi.create.infrastructure.config.AllConfigs;
+import com.simibubi.create.compat.Mods;
 import com.simibubi.create.infrastructure.worldgen.AllBiomeModifiers;
 import com.simibubi.create.infrastructure.worldgen.AllFeatures;
 import com.simibubi.create.infrastructure.worldgen.AllPlacementModifiers;
@@ -133,6 +134,8 @@ public class Create implements ModInitializer {
 		AllDisplayBehaviours.registerDefaults();
 		ContraptionMovementSetting.registerDefaults();
 		AllArmInteractionPointTypes.register();
+		// noinspection Convert2MethodRef
+		Mods.COBBLEMON.executeIfInstalled(() -> () -> com.simibubi.create.compat.cobblemon.CobblemonCompat.init());
 		AllFanProcessingTypes.register();
 		BlockSpoutingBehaviour.registerDefaults();
 		BogeySizes.init();

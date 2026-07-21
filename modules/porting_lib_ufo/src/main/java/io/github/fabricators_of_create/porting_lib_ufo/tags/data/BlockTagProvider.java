@@ -148,14 +148,6 @@ public final class BlockTagProvider extends FabricTagProvider.BlockTagProvider {
 				Blocks.LOOM, Blocks.SMITHING_TABLE, Blocks.SMOKER, Blocks.STONECUTTER);
 
 		// Backwards compat with pre-1.21 tags. Done after so optional tag is last for better readability.
-		// TODO: Remove backwards compat tag entries in 1.22
-//		tagWithOptionalLegacy(Tags.Blocks.BARRELS);
-//		tagWithOptionalLegacy(Tags.Blocks.BARRELS_WOODEN);
-//		tagWithOptionalLegacy(Tags.Blocks.BOOKSHELVES);
-//		tagWithOptionalLegacy(Tags.Blocks.CHESTS);
-//		tagWithOptionalLegacy(Tags.Blocks.CHESTS_ENDER);
-//		tagWithOptionalLegacy(Tags.Blocks.CHESTS_TRAPPED);
-//		tagWithOptionalLegacy(Tags.Blocks.CHESTS_WOODEN);
 		tag(Tags.Blocks.COBBLESTONES).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "cobblestone"));
 		tag(Tags.Blocks.COBBLESTONES_NORMAL).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "cobblestone/normal"));
 		tag(Tags.Blocks.COBBLESTONES_INFESTED).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "cobblestone/infested"));
@@ -212,13 +204,6 @@ public final class BlockTagProvider extends FabricTagProvider.BlockTagProvider {
 		tag(Tags.Blocks.DYED_YELLOW)
 				.addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "glass/yellow"))
 				.addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "stained_glass/yellow"));
-//		tagWithOptionalLegacy(Tags.Blocks.END_STONES);
-//		tagWithOptionalLegacy(Tags.Blocks.ENDERMAN_PLACE_ON_BLACKLIST);
-//		tagWithOptionalLegacy(Tags.Blocks.FENCE_GATES);
-//		tagWithOptionalLegacy(Tags.Blocks.FENCE_GATES_WOODEN);
-//		tagWithOptionalLegacy(Tags.Blocks.FENCES);
-//		tagWithOptionalLegacy(Tags.Blocks.FENCES_NETHER_BRICK);
-//		tagWithOptionalLegacy(Tags.Blocks.FENCES_WOODEN);
 		tag(Tags.Blocks.GRAVELS).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "gravel"));
 		tag(Tags.Blocks.GLASS_BLOCKS).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "glass"));
 		tag(Tags.Blocks.GLASS_BLOCKS_COLORLESS).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "glass_colorless"));
@@ -227,40 +212,7 @@ public final class BlockTagProvider extends FabricTagProvider.BlockTagProvider {
 		tag(Tags.Blocks.GLASS_PANES_COLORLESS).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "glass_panes_colorless"));
 		tag(Tags.Blocks.NETHERRACKS).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "netherrack"));
 		tag(Tags.Blocks.OBSIDIANS).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "obsidian"));
-//		tagWithOptionalLegacy(Tags.Blocks.ORE_BEARING_GROUND_DEEPSLATE);
-//		tagWithOptionalLegacy(Tags.Blocks.ORE_BEARING_GROUND_NETHERRACK);
-//		tagWithOptionalLegacy(Tags.Blocks.ORE_BEARING_GROUND_STONE);
-//		tagWithOptionalLegacy(Tags.Blocks.ORE_RATES_DENSE);
-//		tagWithOptionalLegacy(Tags.Blocks.ORE_RATES_SINGULAR);
-//		tagWithOptionalLegacy(Tags.Blocks.ORE_RATES_SPARSE);
-//		tagWithOptionalLegacy(Tags.Blocks.ORES);
-//		tagWithOptionalLegacy(Tags.Blocks.ORES_COAL);
-//		tagWithOptionalLegacy(Tags.Blocks.ORES_COPPER);
-//		tagWithOptionalLegacy(Tags.Blocks.ORES_DIAMOND);
-//		tagWithOptionalLegacy(Tags.Blocks.ORES_EMERALD);
-//		tagWithOptionalLegacy(Tags.Blocks.ORES_GOLD);
-//		tagWithOptionalLegacy(Tags.Blocks.ORES_IRON);
-//		tagWithOptionalLegacy(Tags.Blocks.ORES_LAPIS);
-//		tagWithOptionalLegacy(Tags.Blocks.ORES_QUARTZ);
-//		tagWithOptionalLegacy(Tags.Blocks.ORES_REDSTONE);
-//		tagWithOptionalLegacy(Tags.Blocks.ORES_NETHERITE_SCRAP);
-//		tagWithOptionalLegacy(Tags.Blocks.ORES_IN_GROUND_DEEPSLATE);
-//		tagWithOptionalLegacy(Tags.Blocks.ORES_IN_GROUND_NETHERRACK);
-//		tagWithOptionalLegacy(Tags.Blocks.ORES_IN_GROUND_STONE);
 		tag(Tags.Blocks.STONES).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "stone"));
-//		tagWithOptionalLegacy(Tags.Blocks.STORAGE_BLOCKS);
-//		tagWithOptionalLegacy(Tags.Blocks.STORAGE_BLOCKS_COAL);
-//		tagWithOptionalLegacy(Tags.Blocks.STORAGE_BLOCKS_COPPER);
-//		tagWithOptionalLegacy(Tags.Blocks.STORAGE_BLOCKS_DIAMOND);
-//		tagWithOptionalLegacy(Tags.Blocks.STORAGE_BLOCKS_EMERALD);
-//		tagWithOptionalLegacy(Tags.Blocks.STORAGE_BLOCKS_GOLD);
-//		tagWithOptionalLegacy(Tags.Blocks.STORAGE_BLOCKS_IRON);
-//		tagWithOptionalLegacy(Tags.Blocks.STORAGE_BLOCKS_LAPIS);
-//		tagWithOptionalLegacy(Tags.Blocks.STORAGE_BLOCKS_RAW_COPPER);
-//		tagWithOptionalLegacy(Tags.Blocks.STORAGE_BLOCKS_RAW_GOLD);
-//		tagWithOptionalLegacy(Tags.Blocks.STORAGE_BLOCKS_RAW_IRON);
-//		tagWithOptionalLegacy(Tags.Blocks.STORAGE_BLOCKS_REDSTONE);
-//		tagWithOptionalLegacy(Tags.Blocks.STORAGE_BLOCKS_NETHERITE);
 		tag(Tags.Blocks.RELOCATION_NOT_SUPPORTED)
 				.addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "relocation_not_supported"))
 				.addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "immovable"));
@@ -269,12 +221,6 @@ public final class BlockTagProvider extends FabricTagProvider.BlockTagProvider {
 		tag(Tags.Blocks.SANDS_COLORLESS).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "sand/colorless"));
 		tag(Tags.Blocks.SANDS_RED).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "sand/red"));
 	}
-
-//	private FabricTagBuilder tagWithOptionalLegacy(TagKey<Block> tag) {
-//		FabricTagBuilder tagAppender = tag(tag);
-//		tagAppender.addOptionalTag(ResourceLocation.fromNamespaceAndPath("c", tag.location().getPath()));
-//		return tagAppender;
-//	}
 
 	private void addColored(TagKey<Block> group, String pattern) {
 		String prefix = group.location().getPath().toUpperCase(Locale.ENGLISH) + '_';

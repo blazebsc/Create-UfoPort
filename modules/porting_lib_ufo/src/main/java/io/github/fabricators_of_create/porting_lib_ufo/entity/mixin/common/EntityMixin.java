@@ -30,15 +30,14 @@ import io.github.fabricators_of_create.porting_lib_ufo.entity.extensions.EntityE
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.portal.DimensionTransition;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements EntityExtensions {
@@ -47,20 +46,36 @@ public abstract class EntityMixin implements EntityExtensions {
 
 	@Inject(at = @At("TAIL"), method = "<init>")
 	public void port_lib$entityInit(EntityType<?> entityType, Level world, CallbackInfo ci) {
-		EntityDimensions dims = ((Entity)((Object)this)).getDimensions(this.getPose());
-		if(dims == null) {
-			return;
+		try {
+			if (((Entity)((Object)this)) instanceof LivingEntity living)
+			{
+				if (living.getAttributes() == null) {
+					return;
+				}
+			}
+			EntityDimensions dims = ((Entity) (Object) this).getDimensions(this.getPose());
+			if (dims == null) {
+				return;
+			}
+			float eye = dims.eyeHeight();
+			dims.withEyeHeight(EntityEvents.EYE_HEIGHT.invoker().onEntitySize((Entity) (Object) this, eye));
+		} catch (Exception e) {
+			// Subclass fields may not be initialized yet during super constructor
+			// (e.g. LivingEntity.getAttributes() == null from Origins / AdditionalEntityAttributes)
 		}
-		float eye = dims.eyeHeight();
-		((Entity)((Object)this)).getDimensions(this.getPose()).withEyeHeight(EntityEvents.EYE_HEIGHT.invoker().onEntitySize((Entity) (Object) this, eye));
 	}
 
 	@WrapOperation(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityDimensions;eyeHeight()F"))
 	private float entitySizeConstructEvent(EntityDimensions instance, Operation<Float> original) {
-		EntityEvents.Size sizeEvent = new EntityEvents.Size((Entity) (Object) this, Pose.STANDING, this.dimensions, original.call(dimensions));
-		sizeEvent.sendEvent();
-		this.dimensions = sizeEvent.getNewSize();
-		return sizeEvent.getNewEyeHeight();
+		try {
+			EntityEvents.Size sizeEvent = new EntityEvents.Size((Entity) (Object) this, Pose.STANDING, this.dimensions, original.call(dimensions));
+			sizeEvent.sendEvent();
+			this.dimensions = sizeEvent.getNewSize();
+			return sizeEvent.getNewEyeHeight();
+		} catch (Exception e) {
+			// Subclass fields may not be initialized yet during super constructor
+			return original.call(instance);
+		}
 	}
 
 	@WrapOperation(method = "refreshDimensions", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityDimensions;eyeHeight()F"))
@@ -134,10 +149,6 @@ public abstract class EntityMixin implements EntityExtensions {
 	@Shadow
 	public abstract boolean isRemoved();
 
-//	@Shadow
-//	@Nullable
-//	protected abstract PortalInfo findDimensionEntryPoint(ServerLevel destination);
-
 	@Shadow
 	public abstract EntityType<?> getType();
 
@@ -182,44 +193,6 @@ public abstract class EntityMixin implements EntityExtensions {
 			MinecartEvents.REMOVE.invoker().minecartRemove(cart, level);
 		}
 	}
-
-//	@Unique
-//	@Override
-//	public Entity changeDimension(DimensionTransition dimTrans) {
-//		if (this.level instanceof ServerLevel && !this.isRemoved()) {
-//			this.level.getProfiler().push("changeDimension");
-//			this.unRide();
-//			this.level.getProfiler().push("reposition");
-//			PortalInfo portalinfo = teleporter.getPortalInfo((Entity) (Object) this, p_20118_, this::findDimensionEntryPoint);
-//			if (portalinfo == null) {
-//				return null;
-//			} else {
-//				Entity transportedEntity = teleporter.placeEntity((Entity) (Object) this, (ServerLevel) this.level, p_20118_, this.yRot, spawnPortal -> { //Forge: Start vanilla logic
-//					this.level.getProfiler().popPush("reloading");
-//					Entity entity = this.getType().create(p_20118_);
-//					if (entity != null) {
-//						entity.restoreFrom((Entity) (Object) this);
-//						entity.moveTo(portalinfo.pos.x, portalinfo.pos.y, portalinfo.pos.z, portalinfo.yRot, entity.getXRot());
-//						entity.setDeltaMovement(portalinfo.speed);
-//						p_20118_.addDuringTeleport(entity);
-//						if (spawnPortal && p_20118_.dimension() == Level.END) {
-//							ServerLevel.makeObsidianPlatform(p_20118_);
-//						}
-//					}
-//					return entity;
-//				}); //Forge: End vanilla logic
-//
-//				this.removeAfterChangingDimensions();
-//				this.level.getProfiler().pop();
-//				((ServerLevel) this.level).resetEmptyTime();
-//				p_20118_.resetEmptyTime();
-//				this.level.getProfiler().pop();
-//				return transportedEntity;
-//			}
-//		} else {
-//			return null;
-//		}
-//	}
 
 	// custom data
 

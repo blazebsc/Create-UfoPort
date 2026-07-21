@@ -4,13 +4,17 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.mojang.serialization.Codec;
 import com.simibubi.create.content.equipment.zapper.ZapperItem;
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.utility.Lang;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -22,6 +26,10 @@ public enum TerrainTools {
 	Overlay(AllIcons.I_OVERLAY), Flatten(AllIcons.I_FLATTEN),
 
 	;
+
+	public static final Codec<TerrainTools> CODEC = Codec.STRING.xmap(TerrainTools::valueOf, TerrainTools::name);
+	public static final StreamCodec<ByteBuf, TerrainTools> STREAM_CODEC =
+		ByteBufCodecs.VAR_INT.map(i -> TerrainTools.values()[i], Enum::ordinal);
 
 	public String translationKey;
 	public AllIcons icon;

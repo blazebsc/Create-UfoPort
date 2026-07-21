@@ -27,7 +27,6 @@ import com.simibubi.create.foundation.gui.AbstractSimiScreen;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.gui.widget.IconButton;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.utility.Components;
 import com.simibubi.create.foundation.utility.Lang;
 
@@ -92,7 +91,8 @@ public class ClipboardScreen extends AbstractSimiScreen {
 		if (pages.isEmpty())
 			pages.add(new ArrayList<>());
 		if (clearBtn == null) {
-			currentPage = !item.has(AllDataComponents.CLIPBOARD_EDITING) ? 0 : item.get(AllDataComponents.CLIPBOARD_EDITING).getInt("PreviouslyOpenedPage");
+			ClipboardData clipData = item.get(AllDataComponents.CLIPBOARD_EDITING);
+			currentPage = clipData == null ? 0 : clipData.tag().getInt("PreviouslyOpenedPage");
 			currentPage = Mth.clamp(currentPage, 0, pages.size() - 1);
 		}
 		currentEntries = pages.get(currentPage);
@@ -103,7 +103,8 @@ public class ClipboardScreen extends AbstractSimiScreen {
 		editContext = new TextFieldHelper(this::getCurrentEntryText, this::setCurrentEntryText, this::getClipboard,
 				this::setClipboard, this::validateTextForEntry);
 		editingIndex = startEmpty ? 0 : -1;
-		readonly = item.has(AllDataComponents.CLIPBOARD_EDITING) && item.get(AllDataComponents.CLIPBOARD_EDITING).getBoolean("Readonly");
+		ClipboardData readonlyCheck = item.get(AllDataComponents.CLIPBOARD_EDITING);
+		readonly = readonlyCheck != null && readonlyCheck.tag().getBoolean("Readonly");
 		if (readonly)
 			editingIndex = -1;
 		if (clearBtn != null)
@@ -320,7 +321,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
 
 		for (int i = 0; i < pages.size(); i++)
 			if (pages.get(i) == currentEntries)
-				ItemHelper.getOrCreateComponent(item, AllDataComponents.CLIPBOARD_EDITING, new CompoundTag()).putInt("PreviouslyOpenedPage", i);
+				ClipboardData.getOrCreate(item).putInt("PreviouslyOpenedPage", i);
 
 		send();
 
@@ -337,9 +338,9 @@ public class ClipboardScreen extends AbstractSimiScreen {
 		ClipboardEntry.saveAll(pages, item);
 		ClipboardOverrides.switchTo(ClipboardType.WRITTEN, item);
 		if (pages.isEmpty())
-			item.set(AllDataComponents.CLIPBOARD_EDITING, new CompoundTag());
-		AllPackets.getChannel().sendToServer(new ClipboardEditPacket(targetSlot, 
-				ItemHelper.getOrCreateComponent(item, AllDataComponents.CLIPBOARD_EDITING, new CompoundTag()), targetedBlock));
+			item.set(AllDataComponents.CLIPBOARD_EDITING, ClipboardData.EMPTY);
+		AllPackets.getChannel().sendToServer(new ClipboardEditPacket(targetSlot,
+				ClipboardData.getOrCreate(item), targetedBlock));
 	}
 
 	@Override

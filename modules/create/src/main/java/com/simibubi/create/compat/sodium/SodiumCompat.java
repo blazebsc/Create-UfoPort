@@ -32,7 +32,6 @@ public class SodiumCompat {
 		if (!Mods.INDIUM.isLoaded()) {
 			ClientPlayConnectionEvents.JOIN.register(SodiumCompat::sendNoIndiumWarning);
 		}
-		ClientPlayConnectionEvents.JOIN.register(SodiumCompat::sendTrackerInfo);
 		if (spriteUtilWorks()) {
 			Minecraft mc = Minecraft.getInstance();
 			WorldRenderEvents.START.register(ctx -> {
@@ -43,18 +42,6 @@ public class SodiumCompat {
 		}
 	}
 	
-	public static void sendTrackerInfo(ClientPacketListener handler, PacketSender sender, Minecraft mc) {
-		if (mc.player == null)
-			return;
-
-		MutableComponent text = ComponentUtils.wrapInSquareBrackets(Components.literal("INFO"))
-				.withStyle(ChatFormatting.AQUA)
-				.append(Components.literal(" You are using Create v-0.9.0-ALPHA, be ready for bugs. You should report them to server's admin")
-				);
-
-		mc.player.displayClientMessage(text, false);
-	}
-
 	public static void sendNoIndiumWarning(ClientPacketListener handler, PacketSender sender, Minecraft mc) {
 		if (mc.player == null)
 			return;

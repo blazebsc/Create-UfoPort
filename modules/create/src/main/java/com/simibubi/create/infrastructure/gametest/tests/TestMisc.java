@@ -9,15 +9,12 @@ import com.simibubi.create.content.schematics.SchematicExport;
 import com.simibubi.create.content.schematics.SchematicItem;
 import com.simibubi.create.content.schematics.cannon.SchematicannonBlockEntity;
 import com.simibubi.create.content.schematics.cannon.SchematicannonBlockEntity.State;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.infrastructure.gametest.CreateGameTestHelper;
 import com.simibubi.create.infrastructure.gametest.GameTestGroup;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
@@ -46,8 +43,8 @@ public class TestMisc {
 			SchematicItem.create(level.holderLookup(Registries.BLOCK), "schematicannon_gametest.nbt", "Deployer");
 		// deploy to pos
 		BlockPos anchor = helper.absolutePos(new BlockPos(1, 2, 1));
-		ItemHelper.getOrCreateComponent(schematic, AllDataComponents.SCHEMATIC_DATA, new CompoundTag()).putBoolean("Deployed", true);
-		ItemHelper.getOrCreateComponent(schematic, AllDataComponents.SCHEMATIC_DATA, new CompoundTag()).put("Anchor", NbtUtils.writeBlockPos(anchor));
+		schematic.set(AllDataComponents.SCHEMATIC_DEPLOYED, true);
+		schematic.set(AllDataComponents.SCHEMATIC_ANCHOR, anchor);
 		// setup cannon
 		BlockPos cannonPos = new BlockPos(3, 2, 6);
 		SchematicannonBlockEntity cannon = helper.getBlockEntity(AllBlockEntityTypes.SCHEMATICANNON.get(), cannonPos);

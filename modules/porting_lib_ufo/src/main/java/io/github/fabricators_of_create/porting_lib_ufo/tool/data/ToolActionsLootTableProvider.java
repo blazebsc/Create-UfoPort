@@ -212,7 +212,7 @@ public final class ToolActionsLootTableProvider extends LootTableProvider {
 		return this.registries.thenCompose(provider -> this.run(output, (HolderLookup.Provider)provider));
 	}
 
-	public CompletableFuture<?> run(CachedOutput pOutput, HolderLookup.Provider provider) {
+	public CompletableFuture<Void> run(CachedOutput pOutput, HolderLookup.Provider provider) {
 		final Map<ResourceKey<LootTable>, LootTable> map = Maps.newHashMap();
 		Map<RandomSupport.Seed128bit, ResourceKey<LootTable>> map1 = new Object2ObjectOpenHashMap<>();
 		this.getTables().forEach((entry) -> entry.provider().apply(provider).generate((key, builder) -> {
@@ -243,14 +243,14 @@ public final class ToolActionsLootTableProvider extends LootTableProvider {
 			});
 			throw new IllegalStateException("Failed to validate loot tables, see logs");
 		} else {
-			return CompletableFuture.allOf(map.entrySet().stream().map((lootTableEntry) -> {
+			List<CompletableFuture<?>> futures = new ArrayList<>();
+			for (Map.Entry<ResourceKey<LootTable>, LootTable> lootTableEntry : map.entrySet()) {
 				ResourceKey<LootTable> lootTableId = lootTableEntry.getKey();
 				LootTable loottable = lootTableEntry.getValue();
 				Path path = this.pathProvider.json(lootTableId.location());
-				//JsonElement elem = LootTable./*CODEC*/DIRECT_CODEC.encodeStart(JsonOps.INSTANCE, loottable).getOrThrow();
-				//return DataProvider.saveStable(pOutput, elem, path);
-				return DataProvider.saveStable(pOutput, provider, LootTable.DIRECT_CODEC, loottable, path);
-			}).toArray(CompletableFuture[]::new));
+				futures.add(DataProvider.saveStable(pOutput, provider, LootTable.DIRECT_CODEC, loottable, path));
+			}
+			return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
 		}
 	}
 }

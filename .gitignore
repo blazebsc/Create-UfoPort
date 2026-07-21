@@ -222,3 +222,10 @@ gradle-app.setting
 run/
 remappedSrc/
 src/main/generated/.cache/
+
+# Serena
+.serena/
+
+# Claude Code
+.claude/
+NUL

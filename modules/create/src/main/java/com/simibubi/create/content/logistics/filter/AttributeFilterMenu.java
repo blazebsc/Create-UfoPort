@@ -3,12 +3,13 @@ package com.simibubi.create.content.logistics.filter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mojang.serialization.Codec;
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.AllMenuTypes;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.utility.Components;
 import com.simibubi.create.foundation.utility.Pair;
 
+import io.netty.buffer.ByteBuf;
 import io.github.fabricators_of_create.porting_lib_ufo.transfer.item.ItemStackHandler;
 import io.github.fabricators_of_create.porting_lib_ufo.transfer.item.SlotItemHandler;
 import net.minecraft.ChatFormatting;
@@ -18,6 +19,8 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickType;
@@ -30,6 +33,11 @@ public class AttributeFilterMenu extends AbstractFilterMenu {
 
 	public enum WhitelistMode {
 		WHITELIST_DISJ, WHITELIST_CONJ, BLACKLIST;
+
+		public static final Codec<WhitelistMode> CODEC =
+			Codec.STRING.xmap(WhitelistMode::valueOf, WhitelistMode::name);
+		public static final StreamCodec<ByteBuf, WhitelistMode> STREAM_CODEC =
+			ByteBufCodecs.VAR_INT.map(i -> WhitelistMode.values()[i], Enum::ordinal);
 	}
 
 	WhitelistMode whitelistMode;
@@ -133,21 +141,23 @@ public class AttributeFilterMenu extends AbstractFilterMenu {
 	protected void initAndReadInventory(ItemStack filterItem) {
 		super.initAndReadInventory(filterItem);
 		selectedAttributes = new ArrayList<>();
-		whitelistMode = WhitelistMode.values()[filterItem.getOrDefault(AllDataComponents.FILTER_DATA, new CompoundTag())
-			.getInt("WhitelistMode")];
-		ListTag attributes = filterItem.getOrDefault(AllDataComponents.FILTER_DATA, new CompoundTag())
-			.getList("MatchedAttributes", Tag.TAG_COMPOUND);
-		attributes.forEach(inbt -> {
-			CompoundTag compound = (CompoundTag) inbt;
+		whitelistMode = filterItem.getOrDefault(AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE,
+			WhitelistMode.values()[filterItem.getOrDefault(AllDataComponents.FILTER_DATA, new CompoundTag())
+				.getInt("WhitelistMode")]);
+		List<CompoundTag> attributes = filterItem.getOrDefault(AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES, List.of());
+		if (attributes.isEmpty() && filterItem.has(AllDataComponents.FILTER_DATA)) {
+			ListTag oldAttributes = filterItem.getOrDefault(AllDataComponents.FILTER_DATA, new CompoundTag())
+				.getList("MatchedAttributes", Tag.TAG_COMPOUND);
+			attributes = oldAttributes.stream().map(CompoundTag.class::cast).toList();
+		}
+		attributes.forEach(compound -> {
 			selectedAttributes.add(Pair.of(ItemAttribute.fromNBT(compound), compound.getBoolean("Inverted")));
 		});
 	}
 
 	@Override
 	protected void saveData(ItemStack filterItem) {
-		ItemHelper.getOrCreateComponent(filterItem, AllDataComponents.FILTER_DATA, new CompoundTag())
-				.putInt("WhitelistMode", whitelistMode.ordinal());
-		ListTag attributes = new ListTag();
+		List<CompoundTag> attributes = new ArrayList<>();
 		selectedAttributes.forEach(at -> {
 			if (at == null)
 				return;
@@ -157,11 +167,12 @@ public class AttributeFilterMenu extends AbstractFilterMenu {
 			compoundNBT.putBoolean("Inverted", at.getSecond());
 			attributes.add(compoundNBT);
 		});
-		ItemHelper.getOrCreateComponent(filterItem, AllDataComponents.FILTER_DATA, new CompoundTag())
-			.put("MatchedAttributes", attributes);
+		filterItem.set(AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE, whitelistMode);
+		filterItem.set(AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES, attributes);
+		filterItem.remove(AllDataComponents.FILTER_DATA);
 		
 		if (attributes.isEmpty() && whitelistMode == WhitelistMode.WHITELIST_DISJ)
-			filterItem.remove(AllDataComponents.FILTER_DATA);
+			filterItem.remove(AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES);
 	}
 
 }

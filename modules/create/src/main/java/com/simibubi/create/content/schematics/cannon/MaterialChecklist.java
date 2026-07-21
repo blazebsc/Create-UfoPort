@@ -7,13 +7,12 @@ import java.util.Locale;
 
 import com.google.common.collect.Sets;
 import com.simibubi.create.AllBlocks;
-import com.simibubi.create.AllDataComponents;
+import com.simibubi.create.content.equipment.clipboard.ClipboardData;
 import com.simibubi.create.content.equipment.clipboard.ClipboardEntry;
 import com.simibubi.create.content.equipment.clipboard.ClipboardOverrides;
 import com.simibubi.create.content.equipment.clipboard.ClipboardOverrides.ClipboardType;
 import com.simibubi.create.content.schematics.requirement.ItemRequirement;
 import com.simibubi.create.content.schematics.requirement.ItemRequirement.ItemUseType;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.utility.Components;
 import com.simibubi.create.foundation.utility.Lang;
 
@@ -25,8 +24,6 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
@@ -95,8 +92,7 @@ public class MaterialChecklist {
 	public ItemStack createWrittenBook() {
 		ItemStack book = new ItemStack(Items.WRITTEN_BOOK);
 
-		//CompoundTag tag = book.getOrCreateTag();
-		List<Filterable<Component>> pages = new ArrayList<Filterable<Component>>();
+		List<Filterable<Component>> pages = new ArrayList<>();
 
 		int itemsWritten = 0;
 		MutableComponent textComponent;
@@ -164,27 +160,19 @@ public class MaterialChecklist {
 				"Schematicannon",
 				0,
 				pages,
-				false
+				true
 		);
-		Component displayName = Lang.translateDirect("materialChecklist")
-				.setStyle(Style.EMPTY.withColor(ChatFormatting.BLUE)
-					.withItalic(Boolean.FALSE));
 		book.set(DataComponents.WRITTEN_BOOK_CONTENT, wbc);
-		book.set(DataComponents.CUSTOM_NAME, displayName);
-//		tag.put("pages", pages);
-//		tag.putBoolean("readonly", true);
-//		tag.putString("author", );
-//		tag.putString("title", );
-//		book.getOrCreateTagElement("display")
-//			.putString("Name", Component.Serializer.toJson(textComponent));
-//		book.setTag(tag);
+		book.set(DataComponents.CUSTOM_NAME, Lang.translateDirect("materialChecklist")
+				.setStyle(Style.EMPTY.withColor(ChatFormatting.BLUE)
+					.withItalic(Boolean.FALSE)));
 
 		return book;
 	}
 
 	public ItemStack createWrittenClipboard() {
 		ItemStack clipboard = AllBlocks.CLIPBOARD.asStack();
-		CompoundTag tag = ItemHelper.getOrCreateComponent(clipboard, AllDataComponents.CLIPBOARD_EDITING, new CompoundTag());
+		CompoundTag tag = ClipboardData.getOrCreate(clipboard);
 		int itemsWritten = 0;
 
 		List<List<ClipboardEntry>> pages = new ArrayList<>();
@@ -248,8 +236,6 @@ public class MaterialChecklist {
 		pages.add(currentPage);
 		ClipboardEntry.saveAll(pages, clipboard);
 		ClipboardOverrides.switchTo(ClipboardType.WRITTEN, clipboard);
-//		clipboard.getOrCreateTagElement("display")
-//			.putString("Name", Component.Serializer.toJson());
 		tag.putBoolean("Readonly", true);
 		clipboard.set(DataComponents.CUSTOM_NAME, Lang.translateDirect("materialChecklist")
 				.setStyle(Style.EMPTY.withItalic(Boolean.FALSE)));

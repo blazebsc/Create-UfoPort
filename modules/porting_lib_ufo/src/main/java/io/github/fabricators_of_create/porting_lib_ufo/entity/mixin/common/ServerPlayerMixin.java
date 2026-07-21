@@ -33,7 +33,11 @@ public abstract class ServerPlayerMixin extends Player {
 
 	@Inject(method = "<init>", at = @At("RETURN"))
 	private void init(MinecraftServer server, ServerLevel world, GameProfile gameProfile, ClientInformation clientInformation, CallbackInfo ci) {
-		ServerPlayerCreationCallback.EVENT.invoker().onCreate((ServerPlayer) (Object) this);
+		try {
+			ServerPlayerCreationCallback.EVENT.invoker().onCreate((ServerPlayer) (Object) this);
+		} catch (Exception e) {
+			// Subclass fields may not be initialized yet during super constructor
+		}
 	}
 
 	@Inject(method = "restoreFrom", at = @At("TAIL"))

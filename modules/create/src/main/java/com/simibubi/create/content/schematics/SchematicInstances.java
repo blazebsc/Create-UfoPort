@@ -8,14 +8,12 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.content.contraptions.StructureTransform;
-import com.simibubi.create.foundation.utility.NbtFixer;
 import com.simibubi.create.foundation.utility.WorldAttached;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -44,10 +42,9 @@ public class SchematicInstances {
 	}
 
 	private static SchematicWorld loadWorld(Level wrapped, ItemStack schematic) {
-		if (schematic == null || !schematic.has(AllDataComponents.SCHEMATIC_DATA))
+		if (schematic == null || !schematic.has(AllDataComponents.SCHEMATIC_FILE))
 			return null;
-		if (!schematic.get(AllDataComponents.SCHEMATIC_DATA)
-			.getBoolean("Deployed"))
+		if (!schematic.getOrDefault(AllDataComponents.SCHEMATIC_DEPLOYED, false))
 			return null;
 
 		StructureTemplate activeTemplate =
@@ -57,8 +54,7 @@ public class SchematicInstances {
 			.equals(Vec3i.ZERO))
 			return null;
 
-		BlockPos anchor = NbtFixer.readBlockPos(schematic.get(AllDataComponents.SCHEMATIC_DATA)
-			, "Anchor");
+		BlockPos anchor = schematic.getOrDefault(AllDataComponents.SCHEMATIC_ANCHOR, BlockPos.ZERO);
 		SchematicWorld world = new SchematicWorld(anchor, wrapped);
 		StructurePlaceSettings settings = SchematicItem.getSettings(schematic);
 		activeTemplate.placeInWorld(world, anchor, anchor, settings, wrapped.getRandom(), Block.UPDATE_CLIENTS);
@@ -72,20 +68,19 @@ public class SchematicInstances {
 	}
 
 	public static void clearHash(ItemStack schematic) {
-		if (schematic == null || !schematic.has(AllDataComponents.SCHEMATIC_DATA))
+		if (schematic == null)
 			return;
-		schematic.get(AllDataComponents.SCHEMATIC_DATA)
-			.remove("SchematicHash");
+		schematic.remove(AllDataComponents.SCHEMATIC_HASH);
 	}
 
 	public static int getHash(ItemStack schematic) {
-		if (schematic == null || !schematic.has(AllDataComponents.SCHEMATIC_DATA))
+		if (schematic == null || !schematic.has(AllDataComponents.SCHEMATIC_FILE))
 			return -1;
-		CompoundTag tag = schematic.get(AllDataComponents.SCHEMATIC_DATA);
-		if (!tag.contains("SchematicHash"))
-			tag.putInt("SchematicHash", tag.toString()
-				.hashCode());
-		return tag.getInt("SchematicHash");
+		if (schematic.has(AllDataComponents.SCHEMATIC_HASH))
+			return schematic.getOrDefault(AllDataComponents.SCHEMATIC_HASH, 0);
+		int hash = schematic.toString().hashCode();
+		schematic.set(AllDataComponents.SCHEMATIC_HASH, hash);
+		return hash;
 	}
 
 }

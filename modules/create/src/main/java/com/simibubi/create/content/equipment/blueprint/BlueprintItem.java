@@ -18,7 +18,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
@@ -110,10 +109,8 @@ public class BlueprintItem extends Item {
 		ItemStackHandler filterItems = FilterItem.getFilterItems(result);
 		for (int i = 0; i < acceptedItems.length; i++)
 			filterItems.setStackInSlot(i, convertIItemListToFilter(acceptedItems[i]));
-		ItemHelper.getOrCreateComponent(result, AllDataComponents.FILTER_DATA, new CompoundTag())
-			.put("Items", filterItems.serializeNBT());
-		//result.getOrCreateTag()
-			//.put("Items", filterItems.serializeNBT());
+		result.set(AllDataComponents.FILTER_ITEMS, ItemHelper.containerContentsFromHandler(filterItems));
+		result.remove(AllDataComponents.FILTER_DATA);
 		return result;
 	}
 
@@ -127,17 +124,15 @@ public class BlueprintItem extends Item {
 		if (itemList instanceof TagValue) {
 			ResourceLocation resourcelocation = ResourceLocation.parse(GsonHelper.getAsString(((MultiItemValue) itemList).serialize(), "tag"));
 			ItemStack filterItem = AllItems.ATTRIBUTE_FILTER.asStack();
-			ItemHelper.getOrCreateComponent(filterItem, AllDataComponents.FILTER_DATA, new CompoundTag())
-			//filterItem.getOrCreateTag()
-					.putInt("WhitelistMode", WhitelistMode.WHITELIST_DISJ.ordinal());
-			ListTag attributes = new ListTag();
+			filterItem.set(AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE, WhitelistMode.WHITELIST_DISJ);
+			java.util.List<CompoundTag> attributes = new java.util.ArrayList<>();
 			ItemAttribute at = new ItemAttribute.InTag(TagKey.create(Registries.ITEM, resourcelocation));
 			CompoundTag compoundNBT = new CompoundTag();
 			at.serializeNBT(compoundNBT);
 			compoundNBT.putBoolean("Inverted", false);
 			attributes.add(compoundNBT);
-			ItemHelper.getOrCreateComponent(filterItem, AllDataComponents.FILTER_DATA, new CompoundTag())
-					.put("MatchedAttributes", attributes);
+			filterItem.set(AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES, attributes);
+			filterItem.remove(AllDataComponents.FILTER_DATA);
 			return filterItem;
 		}
 
@@ -150,9 +145,9 @@ public class BlueprintItem extends Item {
 					break;
 				filterItems.setStackInSlot(i++, itemStack);
 			}
-			CompoundTag tag = ItemHelper.getOrCreateComponent(result, AllDataComponents.FILTER_DATA, new CompoundTag());
-			tag.put("Items", filterItems.serializeNBT());
-			tag.putBoolean("RespectNBT", true);
+			result.set(AllDataComponents.FILTER_ITEMS, ItemHelper.containerContentsFromHandler(filterItems));
+			result.remove(AllDataComponents.FILTER_DATA);
+			result.set(AllDataComponents.FILTER_ITEMS_RESPECT_NBT, true);
 			return result;
 		}
 

@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.AllRecipeTypes;
 import com.simibubi.create.Create;
@@ -19,14 +21,16 @@ import com.simibubi.create.foundation.utility.Lang;
 import com.simibubi.create.foundation.utility.Pair;
 
 import io.github.fabricators_of_create.porting_lib_ufo.transfer.item.ItemHandlerHelper;
+import io.netty.buffer.ByteBuf;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
@@ -112,13 +116,12 @@ public class SequencedAssemblyRecipe implements Recipe<RecipeInput> {
 			return rollResult();
 
 		ItemStack advancedItem = ItemHandlerHelper.copyStackWithSize(getTransitionalItem(), 1);
-		CompoundTag itemTag = advancedItem.getOrDefault(AllDataComponents.SEQUENCED_ASSEMBLY, new CompoundTag());
-		CompoundTag tag = new CompoundTag();
-		tag.putString("id", id.toString());
-		tag.putInt("Step", step + 1);
-		tag.putFloat("Progress", (step + 1f) / (sequence.size() * loops));
-		itemTag.put("SequencedAssembly", tag);
-		advancedItem.set(AllDataComponents.SEQUENCED_ASSEMBLY, itemTag);
+		SequencedAssembly assembly = new SequencedAssembly(
+			id,
+			step + 1,
+			(step + 1f) / (sequence.size() * loops)
+		);
+		advancedItem.set(AllDataComponents.SEQUENCED_ASSEMBLY, assembly);
 		return advancedItem;
 	}
 
@@ -161,11 +164,8 @@ public class SequencedAssemblyRecipe implements Recipe<RecipeInput> {
 			return true;
 		if (input.has(AllDataComponents.SEQUENCED_ASSEMBLY)) {
 			if (getTransitionalItem().getItem() == input.getItem()) {
-				if (input.get(AllDataComponents.SEQUENCED_ASSEMBLY).contains("SequencedAssembly")) {
-					CompoundTag tag = input.get(AllDataComponents.SEQUENCED_ASSEMBLY).getCompound("SequencedAssembly");
-					String id = tag.getString("id");
-					return id.equals(this.id.toString());
-				}
+				SequencedAssembly assembly = input.get(AllDataComponents.SEQUENCED_ASSEMBLY);
+				return assembly.id().equals(this.id);
 			}
 		}
 		return false;
@@ -178,12 +178,7 @@ public class SequencedAssemblyRecipe implements Recipe<RecipeInput> {
 	private int getStep(ItemStack input) {
 		if (!input.has(AllDataComponents.SEQUENCED_ASSEMBLY))
 			return 0;
-		CompoundTag tag = input.get(AllDataComponents.SEQUENCED_ASSEMBLY);
-		if (!tag.contains("SequencedAssembly"))
-			return 0;
-		int step = tag.getCompound("SequencedAssembly")
-			.getInt("Step");
-		return step;
+		return input.get(AllDataComponents.SEQUENCED_ASSEMBLY).step();
 	}
 
 	@Override
@@ -233,11 +228,10 @@ public class SequencedAssemblyRecipe implements Recipe<RecipeInput> {
 	@Environment(EnvType.CLIENT)
 	public static void addToTooltip(ItemStack stack, List<Component> tooltip) {
 		
-		if (!stack.has(AllDataComponents.SEQUENCED_ASSEMBLY) || !stack.get(AllDataComponents.SEQUENCED_ASSEMBLY).contains("SequencedAssembly"))
+		if (!stack.has(AllDataComponents.SEQUENCED_ASSEMBLY))
 			return;
-		CompoundTag compound = stack.get(AllDataComponents.SEQUENCED_ASSEMBLY)
-			.getCompound("SequencedAssembly");
-		ResourceLocation resourceLocation = ResourceLocation.parse(compound.getString("id"));
+		SequencedAssembly assembly = stack.get(AllDataComponents.SEQUENCED_ASSEMBLY);
+		ResourceLocation resourceLocation = assembly.id();
 		Optional<RecipeHolder<?>> optionalRecipe = Minecraft.getInstance().level.getRecipeManager()
 			.byKey(resourceLocation);
 		if (!optionalRecipe.isPresent())
@@ -298,6 +292,21 @@ public class SequencedAssemblyRecipe implements Recipe<RecipeInput> {
 
 	public ItemStack getTransitionalItem() {
 		return transitionalItem.getStack();
+	}
+
+	public record SequencedAssembly(ResourceLocation id, int step, float progress) {
+		public static final Codec<SequencedAssembly> CODEC = RecordCodecBuilder.create(i -> i.group(
+			ResourceLocation.CODEC.fieldOf("id").forGetter(SequencedAssembly::id),
+			Codec.INT.fieldOf("step").forGetter(SequencedAssembly::step),
+			Codec.FLOAT.fieldOf("progress").forGetter(SequencedAssembly::progress)
+		).apply(i, SequencedAssembly::new));
+
+		public static final StreamCodec<ByteBuf, SequencedAssembly> STREAM_CODEC = StreamCodec.composite(
+			ResourceLocation.STREAM_CODEC, SequencedAssembly::id,
+			ByteBufCodecs.INT, SequencedAssembly::step,
+			ByteBufCodecs.FLOAT, SequencedAssembly::progress,
+			SequencedAssembly::new
+		);
 	}
 
 }

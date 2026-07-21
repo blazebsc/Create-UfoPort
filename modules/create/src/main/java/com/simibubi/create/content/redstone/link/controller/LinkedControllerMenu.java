@@ -8,7 +8,6 @@ import com.simibubi.create.foundation.item.ItemHelper;
 
 import io.github.fabricators_of_create.porting_lib_ufo.transfer.item.ItemStackHandler;
 import io.github.fabricators_of_create.porting_lib_ufo.transfer.item.SlotItemHandler;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
@@ -63,8 +62,8 @@ public class LinkedControllerMenu extends GhostItemMenu<ItemStack> {
 
 	@Override
 	protected void saveData(ItemStack contentHolder) {
-		ItemHelper.getOrCreateComponent(contentHolder, AllDataComponents.FILTER_DATA, new CompoundTag())
-			.put("Items", ghostInventory.serializeNBT());
+		contentHolder.set(AllDataComponents.LINKED_CONTROLLER_ITEMS, ItemHelper.containerContentsFromHandler(ghostInventory));
+		contentHolder.remove(AllDataComponents.FILTER_DATA);
 	}
 
 	@Override

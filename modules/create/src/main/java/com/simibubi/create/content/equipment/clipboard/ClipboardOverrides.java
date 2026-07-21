@@ -2,7 +2,6 @@ package com.simibubi.create.content.equipment.clipboard;
 
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.Create;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateItemModelProvider;
 
@@ -30,15 +29,15 @@ public class ClipboardOverrides {
 	}
 
 	public static void switchTo(ClipboardType type, ItemStack clipboardItem) {
-		CompoundTag tag = ItemHelper.getOrCreateComponent(clipboardItem, AllDataComponents.CLIPBOARD_EDITING, new CompoundTag());
+		CompoundTag tag = ClipboardData.getOrCreate(clipboardItem);
 		tag.putInt("Type", type.ordinal());
 	}
 
 	@Environment(EnvType.CLIENT)
 	public static void registerModelOverridesClient(ClipboardBlockItem item) {
 		ItemProperties.register(item, ClipboardType.ID, (pStack, pLevel, pEntity, pSeed) -> {
-			CompoundTag tag = pStack.getOrDefault(AllDataComponents.CLIPBOARD_EDITING, null);
-			return tag == null ? 0 : tag.getInt("Type");
+			ClipboardData data = pStack.get(AllDataComponents.CLIPBOARD_EDITING);
+			return data == null ? 0 : data.tag().getInt("Type");
 		});
 	}
 

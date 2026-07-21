@@ -115,14 +115,13 @@ public class DeployerMovementBehaviour implements MovementBehaviour {
 
 	protected void activateAsSchematicPrinter(MovementContext context, BlockPos pos, DeployerFakePlayer player,
 		Level world, ItemStack filter) {
-		if (!filter.has(AllDataComponents.SCHEMATIC_DATA))
+		if (!filter.has(AllDataComponents.SCHEMATIC_FILE))
 			return;
 		if (!world.getBlockState(pos)
 			.canBeReplaced())
 			return;
 
-		CompoundTag tag = filter.get(AllDataComponents.SCHEMATIC_DATA);
-		if (!tag.getBoolean("Deployed"))
+		if (!filter.getOrDefault(AllDataComponents.SCHEMATIC_DEPLOYED, false))
 			return;
 		SchematicWorld schematicWorld = SchematicInstances.get(world, filter);
 		if (schematicWorld == null)

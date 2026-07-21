@@ -17,7 +17,6 @@ import io.github.fabricators_of_create.porting_lib_ufo.util.EnvExecutor;
 import net.fabricmc.api.EnvType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
@@ -67,18 +66,13 @@ public class BacktankUtil {
 
 	public static int getAir(ItemStack backtank) {
 		return backtank.has(AllDataComponents.AIR_TANK) ? backtank.get(AllDataComponents.AIR_TANK) : 0;
-		//CompoundTag tag = backtank.getOrCreateTag();
-		//return Math.min(tag.getFloat("Air"), maxAir(backtank));
 	}
 
 	public static void consumeAir(LivingEntity entity, ItemStack backtank, int i) {
-		//CompoundTag tag = backtank.getOrCreateTag();
 		int maxAir = maxAir(backtank);
 		int air = getAir(backtank);
 		int newAir = Math.max(air - i, 0);
 		backtank.set(AllDataComponents.AIR_TANK, Math.min(newAir, maxAir));
-		//tag.putFloat("Air", );
-		//backtank.setTag(tag);
 
 		if (!(entity instanceof ServerPlayer player))
 			return;

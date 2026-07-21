@@ -6,14 +6,11 @@ import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.AllTags.AllBlockTags;
 import com.simibubi.create.Create;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.utility.BlockHelper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -87,19 +84,19 @@ public class ZapperInteractionHandler {
 			data.remove("z");
 			data.remove("id");
 		}
-		CompoundTag tag = ItemHelper.getOrCreateComponent(stack, AllDataComponents.ZAPPER, new CompoundTag());
-		if (tag.contains("BlockUsed")
-				&& NbtUtils.readBlockState(player.level().holderLookup(Registries.BLOCK),
-						stack.get(AllDataComponents.ZAPPER).getCompound("BlockUsed")) == newState
-				&& Objects.equals(data, tag.get("BlockData"))) {
+
+		BlockState existingBlockUsed = stack.get(AllDataComponents.SHAPER_BLOCK_USED);
+		if (existingBlockUsed != null
+				&& existingBlockUsed == newState
+				&& Objects.equals(data, stack.get(AllDataComponents.SHAPER_BLOCK_DATA))) {
 			return false;
 		}
 
-		tag.put("BlockUsed", NbtUtils.writeBlockState(newState));
+		stack.set(AllDataComponents.SHAPER_BLOCK_USED, newState);
 		if (data == null)
-			tag.remove("BlockData");
+			stack.remove(AllDataComponents.SHAPER_BLOCK_DATA);
 		else
-			tag.put("BlockData", data);
+			stack.set(AllDataComponents.SHAPER_BLOCK_DATA, data);
 
 		AllSoundEvents.CONFIRM.playOnServer(player.level(), player.blockPosition());
 		return true;

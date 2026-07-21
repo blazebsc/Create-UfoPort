@@ -2,10 +2,8 @@ package com.simibubi.create.content.equipment.symmetryWand;
 
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.content.equipment.symmetryWand.mirror.SymmetryMirror;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.networking.SimplePacketBase;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -41,10 +39,8 @@ public class UpdateSymmetryWandPacket extends SimplePacketBase {
 			}
 			ItemStack stack = player.getItemInHand(hand);
 			if (stack.getItem() instanceof SymmetryWandItem) {
-				ItemHelper.getOrCreateComponent(stack, AllDataComponents.SYM_WAND, new CompoundTag())
-					.put(SymmetryWandItem.SYMMETRY, mirror.writeToNbt());
-				ItemHelper.getOrCreateComponent(stack, AllDataComponents.SYM_WAND, new CompoundTag())
-					.putBoolean(SymmetryWandItem.ENABLE, true);
+				stack.set(AllDataComponents.SYM_WAND, mirror);
+				stack.set(AllDataComponents.SYM_WAND_ENABLE, true);
 			}
 		});
 		return true;

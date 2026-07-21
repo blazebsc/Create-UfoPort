@@ -80,6 +80,9 @@ public class CreateRegistrateTags {
 				.addOptional(Mods.BC.asResource("bits_block")); // fabric: Causes Problems last I checked. TODO:
 																// re-evaluate
 
+		TagGen.addOptional(prov.tag(AllBlockTags.TREE_ATTACHMENTS.tag), Mods.COBBLEMON, "red_apricorn", "blue_apricorn",
+				"yellow_apricorn", "green_apricorn", "pink_apricorn", "white_apricorn", "black_apricorn");
+
 		// VALIDATE
 
 		for (AllBlockTags tag : AllBlockTags.values()) {

@@ -23,6 +23,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 
@@ -74,6 +75,22 @@ public class ItemHelper {
 		if(stack.has(comp)) return stack.get(comp);
 		stack.set(comp, newone);
 		return newone;
+	}
+
+	public static void fillItemStackHandler(ItemContainerContents contents, io.github.fabricators_of_create.porting_lib_ufo.transfer.item.ItemStackHandler inv) {
+		List<ItemStack> itemStacks = contents.stream().toList();
+		int limit = Math.min(itemStacks.size(), inv.getSlotCount());
+		for (int i = 0; i < limit; i++) {
+			inv.setStackInSlot(i, itemStacks.get(i));
+		}
+	}
+
+	public static ItemContainerContents containerContentsFromHandler(io.github.fabricators_of_create.porting_lib_ufo.transfer.item.ItemStackHandler handler) {
+		NonNullList<ItemStack> stacks = NonNullList.withSize(handler.getSlotCount(), ItemStack.EMPTY);
+		for (int i = 0; i < handler.getSlotCount(); i++) {
+			stacks.set(i, handler.getStackInSlot(i));
+		}
+		return ItemContainerContents.fromItems(stacks);
 	}
 	
 	public static void clearComponents(ItemStack is) {

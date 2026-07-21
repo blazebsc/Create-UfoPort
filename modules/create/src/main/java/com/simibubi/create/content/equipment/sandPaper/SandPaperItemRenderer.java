@@ -3,8 +3,6 @@ package com.simibubi.create.content.equipment.sandPaper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.simibubi.create.AllDataComponents;
-import com.simibubi.create.Create;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.item.render.CustomRenderedItemModel;
 import com.simibubi.create.foundation.item.render.CustomRenderedItemModelRenderer;
 import com.simibubi.create.foundation.item.render.PartialItemModelRenderer;
@@ -14,7 +12,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -31,12 +28,12 @@ public class SandPaperItemRenderer extends CustomRenderedItemModelRenderer {
 		boolean leftHand = transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
 		boolean firstPerson = leftHand || transformType == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND;
 
-		CompoundTag tag = ItemHelper.getOrCreateComponent(stack, AllDataComponents.POLISHING, new CompoundTag());
-		boolean jeiMode = tag.contains("JEI");
+		boolean hasPolishing = stack.has(AllDataComponents.POLISHING);
+		boolean jeiMode = hasPolishing && stack.get(AllDataComponents.POLISHING).jei();
 
 		ms.pushPose();
 
-		if (tag.contains("Polishing")) {
+		if (hasPolishing) {
 			ms.pushPose();
 
 			if (transformType == ItemDisplayContext.GUI) {
@@ -59,7 +56,7 @@ public class SandPaperItemRenderer extends CustomRenderedItemModelRenderer {
 					ms.translate(0.0f, bobbing, 0.0F);
 			}
 
-			ItemStack toPolish = ItemStack.parseOptional(Create.getRegistryAccess(), tag.getCompound("Polishing"));
+			ItemStack toPolish = stack.get(AllDataComponents.POLISHING).item();
 			itemRenderer.renderStatic(toPolish, ItemDisplayContext.NONE, light, overlay, ms, buffer, player.level(), 0);
 
 			ms.popPose();

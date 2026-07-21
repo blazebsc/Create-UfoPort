@@ -15,16 +15,11 @@ import com.simibubi.create.foundation.gui.widget.Indicator.State;
 import com.simibubi.create.foundation.gui.widget.Label;
 import com.simibubi.create.foundation.gui.widget.ScrollInput;
 import com.simibubi.create.foundation.gui.widget.SelectionScrollInput;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.utility.Components;
 import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.NBTHelper;
-import com.simibubi.create.foundation.utility.NbtFixer;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
@@ -60,10 +55,9 @@ public class WorldshaperScreen extends ZapperScreen {
 		fontColor = 0x767676;
 		title = zapper.getHoverName();
 
-		CompoundTag nbt = ItemHelper.getOrCreateComponent(zapper, AllDataComponents.ZAPPER, new CompoundTag());
-		currentBrush = NBTHelper.readEnum(nbt, "Brush", TerrainBrushes.class);
-		if (nbt.contains("BrushParams")) {
-			BlockPos paramsData = NbtFixer.readBlockPos(nbt, "BrushParams");
+		currentBrush = zapper.getOrDefault(AllDataComponents.SHAPER_BRUSH, TerrainBrushes.Cuboid);
+		if (zapper.has(AllDataComponents.SHAPER_BRUSH_PARAMS)) {
+			BlockPos paramsData = zapper.get(AllDataComponents.SHAPER_BRUSH_PARAMS);
 			currentBrushParams[0] = paramsData.getX();
 			currentBrushParams[1] = paramsData.getY();
 			currentBrushParams[2] = paramsData.getZ();
@@ -74,9 +68,9 @@ public class WorldshaperScreen extends ZapperScreen {
 				currentAcrossMaterials = true;
 			}
 		}
-		LogUtils.getLogger().info(currentBrushParams[0]+", "+currentBrushParams[1]+", "+currentBrushParams[2]+", "+nbt);
-		currentTool = NBTHelper.readEnum(nbt, "Tool", TerrainTools.class);
-		currentPlacement = NBTHelper.readEnum(nbt, "Placement", PlacementOptions.class);
+		LogUtils.getLogger().info(currentBrushParams[0]+", "+currentBrushParams[1]+", "+currentBrushParams[2]);
+		currentTool = zapper.getOrDefault(AllDataComponents.SHAPER_TOOL, TerrainTools.Fill);
+		currentPlacement = zapper.getOrDefault(AllDataComponents.SHAPER_PLACEMENT_OPTIONS, PlacementOptions.Merged);
 	}
 
 	@Override

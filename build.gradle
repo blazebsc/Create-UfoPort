@@ -32,7 +32,7 @@ repositories {
         content { includeGroupAndSubgroups("com.github") }
     }
     maven { url = "https://maven.dblsaiko.net/" }
-    maven { url = "https://maven.vram.io/" }
+    maven { url = "https://maven.blamejared.com/" } // JEI (was maven.vram.io, which is dead)
     maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // Forge Config API Port
     maven { url = "https://maven.tterrag.com/" } // Flywheel
     maven { url = "https://maven.shedaniel.me/" } // REI and deps
@@ -83,15 +83,16 @@ def compat(DependencyHandler deps) {
         deps.modCompileOnly("maven.modrinth:sodium:$sodium_version")
         deps.modCompileOnly("maven.modrinth:indium:$indium_version")
         deps.modCompileOnly("maven.modrinth:iris:$iris_version")
+        deps.modCompileOnly("com.cobblemon:mod:$cobblemon_version")
 
         recipeViewers(deps)
 }
 
 // setup the three recipe viewer mods
 def recipeViewers(DependencyHandler deps) {
-        deps.modCompileOnly("mezz.jei:jei-$minecraft_version-fabric:$jei_version") { transitive = false }
+        deps.modCompileOnly("mezz.jei:jei-1.21.1-fabric:$jei_version") { transitive = false }
 
-        deps.modLocalRuntime("mezz.jei:jei-$minecraft_version-fabric:$jei_version")
+        deps.modLocalRuntime("mezz.jei:jei-1.21.1-fabric:$jei_version")
 }
 
 allprojects {
@@ -113,14 +114,15 @@ allprojects {
        			content { includeGroupAndSubgroups("com.github") }
     		}
     		maven { url = "https://maven.dblsaiko.net/" }
-    		maven { url = "https://maven.vram.io/" }
+    		maven { url = "https://maven.blamejared.com/" } // JEI (was maven.vram.io, which is dead)
     		maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // Forge Config API Port
     		maven { url = "https://maven.tterrag.com/" } // Flywheel
     		maven { url = "https://api.modrinth.com/maven" } // LazyDFU, Sodium, Sandwichable
     		maven { url = "https://maven.terraformersmc.com/" } // Mod Menu, Trinkets
     		maven { url = "https://squiddev.cc/maven" } // CC:T
     		maven { url = "https://modmaven.dev" } // Botania
-	}	
+    		maven { url = "https://maven.impactdev.net/repository/development/" } // Cobblemon
+	}
 
 	dependencies {
     		setup(dependencies)

@@ -10,7 +10,6 @@ import com.simibubi.create.content.equipment.armor.CapacityEnchantment.ICapacity
 import com.simibubi.create.foundation.item.LayeredArmorItem;
 
 import net.minecraft.core.Holder;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
@@ -54,11 +53,6 @@ public class BacktankItem extends BaseArmorItem implements ICapacityEnchantable 
 			.useOn(ctx);
 	}
 
-//	@Override
-//	public boolean canBeDepleted() {
-//		return false;
-//	}
-
 	@Override
 	public boolean isEnchantable(ItemStack p_77616_1_) {
 		return true;
@@ -85,8 +79,6 @@ public class BacktankItem extends BaseArmorItem implements ICapacityEnchantable 
 
 	public static int getRemainingAir(ItemStack stack) {
 		return stack.has(AllDataComponents.AIR_TANK) ? stack.get(AllDataComponents.AIR_TANK) : 0;
-		//CompoundTag orCreateTag = stack.getOrCreateTag();
-		//return orCreateTag.getInt("Air");
 	}
 
 	public static class BacktankBlockItem extends BlockItem {

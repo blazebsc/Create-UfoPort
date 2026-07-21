@@ -49,7 +49,6 @@ public class ForgeI18n {
 				(stringBuffer, objectToParse) -> parseException(formatString, stringBuffer, objectToParse)));
 		// {0,vr} -> transform VersionRange into cleartext string using
 		// fml.messages.version.restriction.* strings
-//    customFactories.put("vr", (name, formatString, locale) -> new CustomReadOnlyFormat(MavenVersionStringHelper::parseVersionRange));
 		// {0,i18n,fml.message} -> pass object to i18n string 'fml.message'
 		customFactories.put("i18n", (name, formatString, locale) -> new CustomReadOnlyFormat(
 				(stringBuffer, o) -> stringBuffer.append(ForgeI18n.parseMessage(formatString, o))));

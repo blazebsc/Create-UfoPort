@@ -83,13 +83,13 @@ public class FilterItem extends Item implements MenuProvider {
 
 	private List<Component> makeSummary(ItemStack filter) {
 		List<Component> list = new ArrayList<>();
-		if (!filter.has(AllDataComponents.FILTER_DATA))
+		if (!filter.has(AllDataComponents.FILTER_ITEMS) && !filter.has(AllDataComponents.FILTER_DATA)
+			&& !filter.has(AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES))
 			return list;
 
 		if (type == FilterType.REGULAR) {
 			ItemStackHandler filterItems = getFilterItems(filter);
-			boolean blacklist = filter.get(AllDataComponents.FILTER_DATA)
-				.getBoolean("Blacklist");
+			boolean blacklist = filter.getOrDefault(AllDataComponents.FILTER_ITEMS_BLACKLIST, false);
 
 			list.add((blacklist ? Lang.translateDirect("gui.filter.deny_list")
 				: Lang.translateDirect("gui.filter.allow_list")).withStyle(ChatFormatting.GOLD));
@@ -115,8 +115,10 @@ public class FilterItem extends Item implements MenuProvider {
 		}
 
 		if (type == FilterType.ATTRIBUTE) {
-			WhitelistMode whitelistMode = WhitelistMode.values()[filter.get(AllDataComponents.FILTER_DATA)
-				.getInt("WhitelistMode")];
+			WhitelistMode whitelistMode = filter.getOrDefault(AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE,
+				filter.has(AllDataComponents.FILTER_DATA)
+					? WhitelistMode.values()[filter.get(AllDataComponents.FILTER_DATA).getInt("WhitelistMode")]
+					: WhitelistMode.WHITELIST_DISJ);
 			list.add((whitelistMode == WhitelistMode.WHITELIST_CONJ
 				? Lang.translateDirect("gui.attribute_filter.allow_list_conjunctive")
 				: whitelistMode == WhitelistMode.WHITELIST_DISJ
@@ -124,10 +126,13 @@ public class FilterItem extends Item implements MenuProvider {
 					: Lang.translateDirect("gui.attribute_filter.deny_list")).withStyle(ChatFormatting.GOLD));
 
 			int count = 0;
-			ListTag attributes = filter.get(AllDataComponents.FILTER_DATA)
-				.getList("MatchedAttributes", Tag.TAG_COMPOUND);
-			for (Tag inbt : attributes) {
-				CompoundTag compound = (CompoundTag) inbt;
+			List<CompoundTag> attributes = filter.getOrDefault(AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES,
+				List.of());
+			if (attributes.isEmpty() && filter.has(AllDataComponents.FILTER_DATA)) {
+				ListTag oldList = filter.get(AllDataComponents.FILTER_DATA).getList("MatchedAttributes", Tag.TAG_COMPOUND);
+				attributes = oldList.stream().map(CompoundTag.class::cast).toList();
+			}
+			for (CompoundTag compound : attributes) {
 				ItemAttribute attribute = ItemAttribute.fromNBT(compound);
 				if (attribute == null)
 					continue;
@@ -182,11 +187,13 @@ public class FilterItem extends Item implements MenuProvider {
 		ItemStackHandler newInv = new ItemStackHandler(18);
 		if (AllItems.FILTER.get() != stack.getItem())
 			throw new IllegalArgumentException("Cannot get filter items from non-filter: " + stack);
-		if (!stack.has(AllDataComponents.FILTER_DATA))
-			return newInv;
-		CompoundTag invNBT = stack.get(AllDataComponents.FILTER_DATA).getCompound("Items");
-		if (!invNBT.isEmpty())
-			newInv.deserializeNBT(invNBT);
+		if (stack.has(AllDataComponents.FILTER_ITEMS))
+			ItemHelper.fillItemStackHandler(stack.getOrDefault(AllDataComponents.FILTER_ITEMS, net.minecraft.world.item.component.ItemContainerContents.EMPTY), newInv);
+		else if (stack.has(AllDataComponents.FILTER_DATA)) {
+			CompoundTag invNBT = stack.get(AllDataComponents.FILTER_DATA).getCompound("Items");
+			if (!invNBT.isEmpty())
+				newInv.deserializeNBT(invNBT);
+		}
 		return newInv;
 	}
 

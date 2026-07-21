@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import com.ibm.icu.impl.locale.LocaleDistance.Data;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -234,12 +233,6 @@ public class FluidStack implements DataComponentHolder{
 		return isEmpty() || var.isOf(getFluid()) && var.componentsMatch(this.components.asPatch());
 	}
 
-	
-	
-	
-	
-
-	
 	public Tag save(HolderLookup.Provider levelRegistryAccess, Tag nbt) {
 		if (this.isEmpty()) {
             throw new IllegalStateException("Cannot encode empty FluidStack");
@@ -270,7 +263,6 @@ public class FluidStack implements DataComponentHolder{
     
     public static Optional<FluidStack> parse(HolderLookup.Provider lookupProvider, Tag tag) {
         return CODEC.parse(lookupProvider.createSerializationContext(NbtOps.INSTANCE), tag).resultOrPartial();
-        //resultOrPartial(string -> LOGGER.error("Tried to load invalid fluid: '{}'", string))
     }
     
     public static FluidStack parseOptional(HolderLookup.Provider lookupProvider, CompoundTag tag) {
@@ -281,45 +273,9 @@ public class FluidStack implements DataComponentHolder{
     }
     
 
-//	public static FluidStack loadFluidStackFromNBT(CompoundTag tag) {
-//		FluidStack stack;
-//		if (tag.contains("FluidName")) { // legacy forge loading
-//			Fluid fluid = BuiltInRegistries.FLUID.get(ResourceLocation.fromNamespaceAndPath(tag.getString("FluidName")));
-//			int amount = tag.getInt("Amount");
-//			if (tag.contains("Tag")) {
-//				stack = new FluidStack(fluid, amount, tag.getCompound("Tag"));
-//			} else {
-//				stack = new FluidStack(fluid, amount);
-//			}
-//		} else {
-//			CompoundTag fluidTag = tag.getCompound("Variant");
-//			FluidVariant fluid = FluidVariant.fromNbt(fluidTag);
-//			stack = new FluidStack(fluid, tag.getLong("Amount"));
-//			if(tag.contains("Tag", Tag.TAG_COMPOUND))
-//				stack.tag = tag.getCompound("Tag");
-//		}
-//
-//		return stack;
-//	}
-
 	public Component getDisplayName() {
 		return FluidVariantAttributes.getName(this.type);
 	}
-
-//	public static FluidStack readFromPacket(FriendlyByteBuf buffer) {
-//		FluidVariant fluid = FluidVariant.fromPacket(buffer);
-//		long amount = buffer.readVarLong();
-//		CompoundTag tag = buffer.readNbt();
-//		if (fluid.isBlank()) return EMPTY;
-//		return new FluidStack(fluid, amount, tag);
-//	}
-//
-//	public FriendlyByteBuf writeToPacket(FriendlyByteBuf buffer) {
-//		getType().toPacket(buffer);
-//		buffer.writeVarLong(getAmount());
-//		buffer.writeNbt(getTag());
-//		return buffer;
-//	}
 
 	public FluidStack copy() {
 		return new FluidStack(getType(), getAmount(), components);
@@ -417,6 +373,4 @@ public class FluidStack implements DataComponentHolder{
 	public String toString() {
 		return "FluidStack [type=" + type + ", amount=" + amount + ", components=" + components + "]";
 	}
-    
-    
 }

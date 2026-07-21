@@ -1,0 +1,22 @@
+{
+  "fabric:load_conditions": [
+    { "condition": "fabric:all_mods_loaded", "values": ["cobblemon"] }
+  ],
+  "type": "create:milling",
+  "ingredients": [
+    {
+      "item": "cobblemon:red_apricorn"
+    }
+  ],
+  "processingTime": 100,
+  "results": [
+    {
+      "count": 2,
+      "id": "minecraft:red_dye"
+    },
+    {
+      "chance": 0.1,
+      "id": "cobblemon:red_apricorn_seed"
+    }
+  ]
+}

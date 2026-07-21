@@ -1,21 +1,12 @@
 package io.github.fabricators_of_create.porting_lib_ufo.tool.loot;
 
 import java.util.Set;
-import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.MapLike;
-import com.mojang.serialization.RecordBuilder;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import io.github.fabricators_of_create.porting_lib_ufo.core.PortingLib;
@@ -65,32 +56,6 @@ public class CanToolPerformAction implements LootItemCondition {
 	public static LootItemCondition.Builder canToolPerformAction(ToolAction action) {
 		return () -> new CanToolPerformAction(action);
 	}
-
-//	public static class Serializer extends MapCodec<CanToolPerformAction> {
-//		public void serialize(JsonObject json, CanToolPerformAction itemCondition, @NotNull JsonSerializationContext context) {
-//			json.addProperty("action", itemCondition.action.name());
-//		}
-//
-//		@NotNull
-//		public CanToolPerformAction deserialize(JsonObject json, @NotNull JsonDeserializationContext context) {
-//			return new CanToolPerformAction(ToolAction.get(json.get("action").getAsString()));
-//		}
-//
-//		@Override
-//		public <T> RecordBuilder<T> encode(CanToolPerformAction input, DynamicOps<T> ops, RecordBuilder<T> prefix) {
-//			return null;
-//		}
-//
-//		@Override
-//		public <T> DataResult<CanToolPerformAction> decode(DynamicOps<T> ops, MapLike<T> input) {
-//			return null;
-//		}
-//
-//		@Override
-//		public <T> Stream<T> keys(DynamicOps<T> ops) {
-//			return null;
-//		}
-//	}
 
 	public static void init() {
 		Registry.register(BuiltInRegistries.LOOT_CONDITION_TYPE, PortingLib.id("can_tool_perform_action"), CanToolPerformAction.LOOT_CONDITION_TYPE);

@@ -1,6 +1,8 @@
 package com.simibubi.create.content.contraptions.actors.seat;
 
 import com.simibubi.create.AllEntityTypes;
+import com.simibubi.create.compat.Mods;
+import com.simibubi.create.compat.cobblemon.CobblemonCompat;
 
 import io.github.fabricators_of_create.porting_lib_ufo.entity.IEntityAdditionalSpawnData;
 import io.github.fabricators_of_create.porting_lib_ufo.entity.PortingLibEntity;
@@ -111,6 +113,8 @@ public class SeatEntity extends Entity implements IEntityAdditionalSpawnData {
 		super.removePassenger(entity);
 		if (entity instanceof TamableAnimal ta)
 			ta.setInSittingPose(false);
+		if (Mods.COBBLEMON.isLoaded() && CobblemonCompat.isSeatSpawnedPokemon(entity))
+			entity.discard();
 	}
 
 	@Override

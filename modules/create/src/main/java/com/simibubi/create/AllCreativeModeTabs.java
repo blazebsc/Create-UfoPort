@@ -16,7 +16,6 @@ import com.simibubi.create.content.equipment.armor.BacktankUtil;
 import com.simibubi.create.content.equipment.toolbox.ToolboxBlock;
 import com.simibubi.create.content.kinetics.crank.ValveHandleBlock;
 import com.simibubi.create.foundation.data.CreateRegistrate;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.item.TagDependentIngredientItem;
 import com.simibubi.create.foundation.utility.Components;
 import com.tterrag.registrate.util.entry.BlockEntry;
@@ -53,8 +52,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-
-import org.apache.commons.lang3.mutable.MutableObject;
 
 public class AllCreativeModeTabs {
 
@@ -176,12 +173,10 @@ public class AllCreativeModeTabs {
 					item -> {
 						ItemStack stack = new ItemStack(item);
 						stack.set(AllDataComponents.AIR_TANK, BacktankUtil.maxAirWithoutEnchants());
-						//stack.getOrCreateTag().putInt("Air", BacktankUtil.maxAirWithoutEnchants());
 						return stack;
 					}, AllItems.NETHERITE_BACKTANK, item -> {
 						ItemStack stack = new ItemStack(item);
 						stack.set(AllDataComponents.AIR_TANK, BacktankUtil.maxAirWithoutEnchants());
-						//stack.getOrCreateTag().putInt("Air", BacktankUtil.maxAirWithoutEnchants());
 						return stack;
 					});
 

@@ -18,11 +18,8 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomData;
 
 @ApiStatus.Experimental
 public class FluidHandlerItemStack implements Storage<FluidVariant> {
@@ -54,23 +51,10 @@ public class FluidHandlerItemStack implements Storage<FluidVariant> {
 			return FluidStack.EMPTY;
 		}
 		return opt.get();
-		//CompoundTag tagCompound = container.getItemVariant().getComponents();
-		//if (tagCompound == null || !tagCompound.contains(FLUID_NBT_KEY)) {
-			//return FluidStack.EMPTY;
-		//}
-		//return FluidStack.loadFluidStackFromNBT(tagCompound.getCompound(FLUID_NBT_KEY));
 	}
 
 	protected boolean setFluid(FluidStack fluid, TransactionContext tx) {
 		ItemStack newStack = container.getItemVariant().toStack();
-		//if (!newStack.hasTag()) {
-			//newStack.setTag(new CompoundTag());
-		//}
-
-		//CompoundTag fluidTag = new CompoundTag();
-		//fluid.writeToNBT(fluidTag);
-		//newStack.getTag().put(FLUID_NBT_KEY, fluidTag);
-		
 		newStack.set(FLUID_DATA, fluid);
 
 		if (container.exchange(ItemVariant.of(newStack), 1, tx) == 1)

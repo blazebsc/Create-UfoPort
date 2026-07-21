@@ -356,8 +356,7 @@ public class DeployerHandler {
 		}
 
 		if (stack.getItem() instanceof SandPaperItem && stack.has(AllDataComponents.POLISHING)) {
-			player.spawnedItemEffects = ItemStack.parseOptional(Create.getRegistryAccess(), 
-					stack.get(AllDataComponents.POLISHING).getCompound("Polishing"));
+			player.spawnedItemEffects = stack.get(AllDataComponents.POLISHING).item();
 			AllSoundEvents.SANDING_SHORT.playOnServer(world, pos, .25f, 1f);
 		}
 
@@ -423,7 +422,11 @@ public class DeployerHandler {
 		InteractionHand hand, BlockHitResult ray) {
 		if (state.getBlock() instanceof BeehiveBlock)
 			return safeOnBeehiveUse(state, world, pos, player, hand);
-		return state.useItemOn(player.getItemInHand(hand), world, player, hand, ray).result();
+		InteractionResult result = state.useItemOn(player.getItemInHand(hand), world, player, hand, ray).result();
+		if (!result.consumesAction() && player.getItemInHand(hand).isEmpty()) {
+			result = state.useWithoutItem(world, player, ray);
+		}
+		return result;
 	}
 
 	protected static InteractionResult safeOnBeehiveUse(BlockState state, Level world, BlockPos pos, Player player,

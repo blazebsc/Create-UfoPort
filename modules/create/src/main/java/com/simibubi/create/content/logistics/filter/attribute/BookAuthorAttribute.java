@@ -53,11 +53,9 @@ public class BookAuthorAttribute implements ItemAttribute {
     }
 
     private String extractAuthor(ItemStack stack) {
-    	return stack.has(DataComponents.WRITTEN_BOOK_CONTENT) ? stack.get(DataComponents.WRITTEN_BOOK_CONTENT).author() : "";
-//        CompoundTag nbt = stack.getTag();
-//        if (nbt != null && nbt.contains("author")) {
-//            return nbt.getString("author");
-//        }
-//        return "";
+    	if (stack.has(DataComponents.WRITTEN_BOOK_CONTENT)) {
+    		return stack.get(DataComponents.WRITTEN_BOOK_CONTENT).author();
+    	}
+    	return "";
     }
 }

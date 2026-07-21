@@ -244,20 +244,8 @@ public final class ItemTagProvider extends FabricTagProvider.ItemTagProvider {
 		tag(Tags.Items.ENCHANTABLES).forceAddTag(ItemTags.ARMOR_ENCHANTABLE).forceAddTag(ItemTags.EQUIPPABLE_ENCHANTABLE).forceAddTag(ItemTags.WEAPON_ENCHANTABLE).forceAddTag(ItemTags.SWORD_ENCHANTABLE).forceAddTag(ItemTags.MINING_ENCHANTABLE).forceAddTag(ItemTags.MINING_LOOT_ENCHANTABLE).forceAddTag(ItemTags.FISHING_ENCHANTABLE).forceAddTag(ItemTags.TRIDENT_ENCHANTABLE).forceAddTag(ItemTags.BOW_ENCHANTABLE).forceAddTag(ItemTags.CROSSBOW_ENCHANTABLE).forceAddTag(ItemTags.FIRE_ASPECT_ENCHANTABLE).forceAddTag(ItemTags.DURABILITY_ENCHANTABLE).addOptionalTag(ItemTags.MACE_ENCHANTABLE);
 
 		// Backwards compat with pre-1.21 tags. Done after so optional tag is last for better readability.
-		// TODO: Remove backwards compat tag entries in 1.22
-//		tagWithOptionalLegacy(Tags.Items.BONES);
 		tag(Tags.Items.BRICKS_NORMAL).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "ingots/brick"));
 		tag(Tags.Items.BRICKS_NETHER).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "ingots/nether_brick"));
-//		tagWithOptionalLegacy(Tags.Items.CROPS);
-//		tagWithOptionalLegacy(Tags.Items.CROPS_BEETROOT);
-//		tagWithOptionalLegacy(Tags.Items.CROPS_CARROT);
-//		tagWithOptionalLegacy(Tags.Items.CROPS_NETHER_WART);
-//		tagWithOptionalLegacy(Tags.Items.CROPS_POTATO);
-//		tagWithOptionalLegacy(Tags.Items.CROPS_WHEAT);
-//		tagWithOptionalLegacy(Tags.Items.DUSTS);
-//		tagWithOptionalLegacy(Tags.Items.DUSTS_GLOWSTONE);
-//		tagWithOptionalLegacy(Tags.Items.DUSTS_REDSTONE);
-//		tagColoredWithOptionalLegacy(Tags.Items.DYES);
 		tag(Tags.Items.DYED_BLACK)
 				.addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "glass/black"))
 				.addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "stained_glass/black"));
@@ -309,45 +297,10 @@ public final class ItemTagProvider extends FabricTagProvider.ItemTagProvider {
 		tag(Tags.Items.DYED_YELLOW)
 				.addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "glass/yellow"))
 				.addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "stained_glass/yellow"));
-//		tagWithOptionalLegacy(Tags.Items.ENDER_PEARLS);
-//		tagWithOptionalLegacy(Tags.Items.FEATHERS);
-//		tagWithOptionalLegacy(Tags.Items.GEMS);
-//		tagWithOptionalLegacy(Tags.Items.GEMS_AMETHYST);
-//		tagWithOptionalLegacy(Tags.Items.GEMS_DIAMOND);
-//		tagWithOptionalLegacy(Tags.Items.GEMS_EMERALD);
-//		tagWithOptionalLegacy(Tags.Items.GEMS_LAPIS);
-//		tagWithOptionalLegacy(Tags.Items.GEMS_PRISMARINE);
-//		tagWithOptionalLegacy(Tags.Items.GEMS_QUARTZ);
 		tag(Tags.Items.GUNPOWDERS).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "gunpowder"));
-//		tagWithOptionalLegacy(Tags.Items.INGOTS);
-//		tagWithOptionalLegacy(Tags.Items.INGOTS_COPPER);
-//		tagWithOptionalLegacy(Tags.Items.INGOTS_GOLD);
-//		tagWithOptionalLegacy(Tags.Items.INGOTS_IRON);
-//		tagWithOptionalLegacy(Tags.Items.INGOTS_NETHERITE);
 		tag(Tags.Items.LEATHERS).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "leather"));
-//		tagWithOptionalLegacy(Tags.Items.MUSHROOMS);
-//		tagWithOptionalLegacy(Tags.Items.NETHER_STARS);
-//		tagWithOptionalLegacy(Tags.Items.NUGGETS);
-//		tagWithOptionalLegacy(Tags.Items.NUGGETS_IRON);
-//		tagWithOptionalLegacy(Tags.Items.NUGGETS_GOLD);
-//		tagWithOptionalLegacy(Tags.Items.RAW_MATERIALS);
-//		tagWithOptionalLegacy(Tags.Items.RAW_MATERIALS_COPPER);
-//		tagWithOptionalLegacy(Tags.Items.RAW_MATERIALS_GOLD);
-//		tagWithOptionalLegacy(Tags.Items.RAW_MATERIALS_IRON);
-//		tagWithOptionalLegacy(Tags.Items.RODS);
-//		tagWithOptionalLegacy(Tags.Items.RODS_BLAZE);
-//		tagWithOptionalLegacy(Tags.Items.RODS_WOODEN);
-//		tagWithOptionalLegacy(Tags.Items.SEEDS);
-//		tagWithOptionalLegacy(Tags.Items.SEEDS_BEETROOT);
-//		tagWithOptionalLegacy(Tags.Items.SEEDS_MELON);
-//		tagWithOptionalLegacy(Tags.Items.SEEDS_PUMPKIN);
-//		tagWithOptionalLegacy(Tags.Items.SEEDS_WHEAT);
-//		tagWithOptionalLegacy(Tags.Items.SLIMEBALLS);
-//		tagWithOptionalLegacy(Tags.Items.STRINGS);
 		tag(Tags.Items.TOOLS_SHEAR).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "shears"));
 		tag(Tags.Items.TOOLS_SPEAR).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "tools/tridents"));
-//		tagWithOptionalLegacy(Tags.Items.TOOLS);
-//		tagWithOptionalLegacy(Tags.Items.ARMORS);
 		tag(Tags.Items.TOOLS_SHIELD).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "tools/shields"));
 		tag(Tags.Items.TOOLS_BOW).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "tools/bows"));
 		tag(Tags.Items.TOOLS_BRUSH).addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", "tools/brushes"));
@@ -363,20 +316,6 @@ public final class ItemTagProvider extends FabricTagProvider.ItemTagProvider {
 		tag(Tags.Items.TOOLS_SHEAR).addOptionalTag(ResourceLocation.fromNamespaceAndPath("c", "tools/shears"));
 		tag(Tags.Items.TOOLS_SPEAR).addOptionalTag(ResourceLocation.fromNamespaceAndPath("c", "tools/tridents"));
 	}
-
-//	private FabricTagBuilder tagWithOptionalLegacy(TagKey<Item> tag) {
-//		FabricTagBuilder tagAppender = tag(tag);
-//		tagAppender.addOptionalTag(ResourceLocation.fromNamespaceAndPath("forge", tag.location().getPath()));
-//		return tagAppender;
-//	}
-
-//	private void tagColoredWithOptionalLegacy(TagKey<Item> group) {
-//		String prefix = group.location().getPath().toUpperCase(Locale.ENGLISH) + '_';
-//		for (DyeColor color : DyeColor.values()) {
-//			TagKey<Item> tag = getForgeItemTag(prefix + color.getName());
-//			tagWithOptionalLegacy(tag);
-//		}
-//	}
 
 	private void addColored(TagKey<Item> group, String pattern) {
 		String prefix = group.location().getPath().toUpperCase(Locale.ENGLISH) + '_';

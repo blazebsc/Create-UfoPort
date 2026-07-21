@@ -1052,5 +1052,8 @@
 	"create.bogey.style.invalid": "Unnamed style",
 	"create.bogey.style.standard": "Standard",
 
-  "create.potion.invalid": "Invalid Potion"
+  "create.potion.invalid": "Invalid Potion",
+
+	"create.pokemon_seat.title": "Assign Pokemon to Seat",
+	"create.pokemon_seat.select": "Click to Seat"
 }

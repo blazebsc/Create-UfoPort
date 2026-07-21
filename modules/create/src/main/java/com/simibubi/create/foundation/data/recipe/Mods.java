@@ -38,7 +38,8 @@ public enum Mods {
 	MI("modern_industrialization"),
 	MTM("mythicmetals"),
 	ALG("alloygery"),
-	BC("bitsandchisels")
+	BC("bitsandchisels"),
+	COBBLEMON("cobblemon")
 
 	;
 

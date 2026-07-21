@@ -63,12 +63,9 @@ public class BookCopyAttribute implements ItemAttribute {
 	}
 
     private int extractGeneration(ItemStack stack) {
-    	return (stack.getItem() instanceof WrittenBookItem && stack.has(DataComponents.WRITTEN_BOOK_CONTENT)) 
-    			? stack.get(DataComponents.WRITTEN_BOOK_CONTENT).generation() : -1;
-//        CompoundTag nbt = stack.getTag();
-//        if (nbt != null && stack.getItem() instanceof WrittenBookItem) {
-//            return nbt.getInt("generation");
-//        }
-//        return -1;
+    	if (stack.getItem() instanceof WrittenBookItem && stack.has(DataComponents.WRITTEN_BOOK_CONTENT)) {
+    		return stack.get(DataComponents.WRITTEN_BOOK_CONTENT).generation();
+    	}
+    	return -1;
     }
 }

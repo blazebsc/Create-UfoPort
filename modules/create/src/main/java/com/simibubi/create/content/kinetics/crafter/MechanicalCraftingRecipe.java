@@ -182,21 +182,6 @@ public class MechanicalCraftingRecipe extends ShapedRecipe {
 			return STREAM_CODEC;
 		}
 
-//		@Override
-//		public ShapedRecipe fromNetwork(FriendlyByteBuf buffer) {
-//			return fromShaped(super.fromNetwork(buffer), buffer.readBoolean() && buffer.readBoolean());
-//		}
-//
-//		@Override
-//		public void toNetwork(FriendlyByteBuf p_199427_1_, ShapedRecipe p_199427_2_) {
-//			super.toNetwork(p_199427_1_, p_199427_2_);
-//			if (p_199427_2_ instanceof MechanicalCraftingRecipe) {
-//				p_199427_1_.writeBoolean(true);
-//				p_199427_1_.writeBoolean(((MechanicalCraftingRecipe) p_199427_2_).acceptsMirrored());
-//			} else
-//				p_199427_1_.writeBoolean(false);
-//		}
-
 	}
 
 }

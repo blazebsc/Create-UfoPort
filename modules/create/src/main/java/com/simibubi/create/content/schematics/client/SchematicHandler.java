@@ -19,13 +19,10 @@ import com.simibubi.create.content.schematics.SchematicWorld;
 import com.simibubi.create.content.schematics.client.tools.ToolType;
 import com.simibubi.create.content.schematics.packet.SchematicPlacePacket;
 import com.simibubi.create.content.schematics.packet.SchematicSyncPacket;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.outliner.AABBOutline;
 import com.simibubi.create.foundation.render.SuperRenderTypeBuffer;
 import com.simibubi.create.foundation.utility.AnimationTickHolder;
 import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.NBTHelper;
-import com.simibubi.create.foundation.utility.NbtFixer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -34,8 +31,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -111,8 +106,7 @@ public class SchematicHandler {
 			return;
 		}
 
-		if (!active || !stack.getOrDefault(AllDataComponents.SCHEMATIC_DATA, new CompoundTag())
-			.getString("File")
+		if (!active || !stack.getOrDefault(AllDataComponents.SCHEMATIC_FILE, "")
 			.equals(displayedSchematic))
 			init(player, stack);
 		if (!active)
@@ -131,8 +125,7 @@ public class SchematicHandler {
 
 	private void init(LocalPlayer player, ItemStack stack) {
 		loadSettings(stack);
-		displayedSchematic = stack.getOrDefault(AllDataComponents.SCHEMATIC_DATA, new CompoundTag())
-			.getString("File");
+		displayedSchematic = stack.getOrDefault(AllDataComponents.SCHEMATIC_FILE, "");
 		active = true;
 		if (deployed) {
 			setupRenderer();
@@ -303,7 +296,7 @@ public class SchematicHandler {
 		ItemStack stack = player.getMainHandItem();
 		if (!AllItems.SCHEMATIC.isIn(stack))
 			return null;
-		if (!stack.has(AllDataComponents.SCHEMATIC_DATA))
+		if (!stack.has(AllDataComponents.SCHEMATIC_FILE))
 			return null;
 
 		activeSchematicItem = stack;
@@ -339,15 +332,14 @@ public class SchematicHandler {
 	}
 
 	public void loadSettings(ItemStack blueprint) {
-		CompoundTag tag = blueprint.getOrDefault(AllDataComponents.SCHEMATIC_DATA, new CompoundTag());
 		BlockPos anchor = BlockPos.ZERO;
 		StructurePlaceSettings settings = SchematicItem.getSettings(blueprint);
 		transformation = new SchematicTransformation();
 
-		deployed = tag.getBoolean("Deployed");
+		deployed = blueprint.getOrDefault(AllDataComponents.SCHEMATIC_DEPLOYED, false);
 		if (deployed)
-			anchor = NbtFixer.readBlockPos(tag, "Anchor");
-		Vec3i size = NBTHelper.readVec3i(tag.getList("Bounds", Tag.TAG_INT));
+			anchor = blueprint.getOrDefault(AllDataComponents.SCHEMATIC_ANCHOR, BlockPos.ZERO);
+		Vec3i size = blueprint.getOrDefault(AllDataComponents.SCHEMATIC_BOUNDS, Vec3i.ZERO);
 
 		bounds = new AABB(0, 0, 0, size.getX(), size.getY(), size.getZ());
 		outline = new AABBOutline(bounds);
@@ -372,8 +364,7 @@ public class SchematicHandler {
 
 	public void printInstantly() {
 		AllPackets.getChannel().sendToServer(new SchematicPlacePacket(activeSchematicItem.copy()));
-		CompoundTag nbt = ItemHelper.getOrCreateComponent(activeSchematicItem, AllDataComponents.SCHEMATIC_DATA, new CompoundTag());
-		nbt.putBoolean("Deployed", false);
+		activeSchematicItem.set(AllDataComponents.SCHEMATIC_DEPLOYED, false);
 		SchematicInstances.clearHash(activeSchematicItem);
 		renderers.forEach(r -> r.setActive(false));
 		active = false;

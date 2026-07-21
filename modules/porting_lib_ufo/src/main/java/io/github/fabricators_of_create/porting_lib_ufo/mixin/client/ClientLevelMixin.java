@@ -23,6 +23,10 @@ public abstract class ClientLevelMixin {
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	public void port_lib$init(CallbackInfo ci) {
-		ClientWorldEvents.LOAD.invoker().onWorldLoad(minecraft, MixinHelper.cast(this));
+		try {
+			ClientWorldEvents.LOAD.invoker().onWorldLoad(minecraft, MixinHelper.cast(this));
+		} catch (Exception e) {
+			// Subclass fields may not be initialized yet during super constructor
+		}
 	}
 }

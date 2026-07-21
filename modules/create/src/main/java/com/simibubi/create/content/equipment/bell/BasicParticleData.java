@@ -2,23 +2,18 @@ package com.simibubi.create.content.equipment.bell;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import com.mojang.brigadier.StringReader;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.simibubi.create.foundation.particle.ICustomParticleDataWithSprite;
-import com.simibubi.create.foundation.utility.RegisteredObjects;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 
@@ -28,33 +23,36 @@ public abstract class BasicParticleData<T extends Particle> implements ParticleO
 
 	public BasicParticleData() { }
 
-//	@Override
-//	public Deserializer<BasicParticleData<T>> getDeserializer() {
-//		BasicParticleData<T> data = this;
-//		return new ParticleOptions.Deserializer<BasicParticleData<T>>() {
-//			@Override
-//			public BasicParticleData<T> fromCommand(ParticleType<BasicParticleData<T>> arg0, StringReader reader) {
-//				return data;
-//			}
-//
-//			@Override
-//			public BasicParticleData<T> fromNetwork(ParticleType<BasicParticleData<T>> type, FriendlyByteBuf buffer) {
-//				return data;
-//			}
-//		};
-//	}
-	
-	
-
 	@Override
 	public MapCodec<BasicParticleData<T>> getCodec(ParticleType<BasicParticleData<T>> type) {
 		return MapCodec.unit(this);
 	}
-	
+
 	@Override
 	public StreamCodec<RegistryFriendlyByteBuf, BasicParticleData<T>> getStreamCodec(
 			ParticleType<BasicParticleData<T>> type) {
 		return StreamCodec.unit(this);
+	}
+
+	@Override
+	public ParticleType<BasicParticleData<T>> createType() {
+		BasicParticleData<T> self = this;
+		return new ParticleType<BasicParticleData<T>>(false) {
+			@Override
+			public MapCodec<BasicParticleData<T>> codec() {
+				return self.getCodec(this);
+			}
+			@Override
+			public StreamCodec<? super RegistryFriendlyByteBuf, BasicParticleData<T>> streamCodec() {
+				return self.getStreamCodec(this);
+			}
+		};
+	}
+
+	@Override
+	@Environment(EnvType.CLIENT)
+	public ParticleProvider<BasicParticleData<T>> getFactory() {
+		throw new IllegalAccessError("This particle type uses a metaFactory!");
 	}
 
 	public interface IBasicParticleFactory<U extends Particle> {
@@ -71,11 +69,4 @@ public abstract class BasicParticleData<T extends Particle> implements ParticleO
 				getBasicFactory().makeParticle(worldIn, x, y, z, vx, vy, vz, animatedSprite);
 	}
 
-//	@Override
-//	public String writeToString() {
-//		return RegisteredObjects.getKeyOrThrow(getType()).toString();
-//	}
-//
-//	@Override
-//	public void writeToNetwork(FriendlyByteBuf buffer) { }
 }

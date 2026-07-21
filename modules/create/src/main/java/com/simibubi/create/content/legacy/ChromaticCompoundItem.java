@@ -1,7 +1,5 @@
 package com.simibubi.create.content.legacy;
 
-import java.util.Random;
-
 import org.apache.commons.lang3.mutable.MutableBoolean;
 
 import com.simibubi.create.AllDataComponents;
@@ -21,7 +19,6 @@ import io.github.fabricators_of_create.porting_lib_ufo.item.EntityTickListenerIt
 import io.github.fabricators_of_create.porting_lib_ufo.mixin.accessors.common.accessor.BeaconBlockEntityAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
@@ -231,13 +228,10 @@ public class ChromaticCompoundItem extends Item implements CustomMaxCountItem, E
 
 		ItemStack newStack = stack.split(1);
 		newStack.set(AllDataComponents.COLLECTING_LIGHT, newStack.getOrDefault(AllDataComponents.COLLECTING_LIGHT, 0) + 1);
-//		newStack.getOrCreateTag()
-//			.putInt("CollectingLight", itemData.getInt("CollectingLight") + 1);
 		ItemEntity newEntity = new ItemEntity(world, entity.getX(), entity.getY(), entity.getZ(), newStack);
 		newEntity.setDeltaMovement(entity.getDeltaMovement());
 		newEntity.setDefaultPickUpDelay();
 		world.addFreshEntity(newEntity);
-//		entity.lifespan = 6000;
 		if (stack.isEmpty())
 			entity.discard();
 		return true;

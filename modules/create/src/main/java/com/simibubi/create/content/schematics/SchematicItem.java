@@ -19,10 +19,8 @@ import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.content.schematics.client.SchematicEditScreen;
 import com.simibubi.create.foundation.gui.ScreenOpener;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.utility.Components;
 import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.NBTHelper;
 import com.tterrag.registrate.fabric.EnvExecutor;
 
 import net.fabricmc.api.EnvType;
@@ -31,10 +29,10 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderGetter;
+import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -62,14 +60,12 @@ public class SchematicItem extends Item {
 	public static ItemStack create(HolderGetter<Block> lookup, String schematic, String owner) {
 		ItemStack blueprint = AllItems.SCHEMATIC.asStack();
 
-		CompoundTag tag = new CompoundTag();
-		tag.putBoolean("Deployed", false);
-		tag.putString("Owner", owner);
-		tag.putString("File", schematic);
-		tag.put("Anchor", NbtUtils.writeBlockPos(BlockPos.ZERO));
-		tag.putString("Rotation", Rotation.NONE.name());
-		tag.putString("Mirror", Mirror.NONE.name());
-		blueprint.set(AllDataComponents.SCHEMATIC_DATA, tag);
+		blueprint.set(AllDataComponents.SCHEMATIC_DEPLOYED, false);
+		blueprint.set(AllDataComponents.SCHEMATIC_OWNER, owner);
+		blueprint.set(AllDataComponents.SCHEMATIC_FILE, schematic);
+		blueprint.set(AllDataComponents.SCHEMATIC_ANCHOR, BlockPos.ZERO);
+		blueprint.set(AllDataComponents.SCHEMATIC_ROTATION, Rotation.NONE);
+		blueprint.set(AllDataComponents.SCHEMATIC_MIRROR, Mirror.NONE);
 
 		writeSize(lookup, blueprint);
 		return blueprint;
@@ -78,11 +74,10 @@ public class SchematicItem extends Item {
 	@Override
 	@Environment(value = EnvType.CLIENT)
 	public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
-		if (stack.has(AllDataComponents.SCHEMATIC_DATA)) {
-			if (stack.get(AllDataComponents.SCHEMATIC_DATA)
-				.contains("File"))
-				tooltip.add(Components.literal(ChatFormatting.GOLD + stack.get(AllDataComponents.SCHEMATIC_DATA)
-					.getString("File")));
+		if (stack.has(AllDataComponents.SCHEMATIC_FILE)) {
+			String file = stack.getOrDefault(AllDataComponents.SCHEMATIC_FILE, "");
+			if (!file.isEmpty())
+				tooltip.add(Components.literal(ChatFormatting.GOLD + file));
 		} else {
 			tooltip.add(Lang.translateDirect("schematic.invalid").withStyle(ChatFormatting.RED));
 		}
@@ -90,9 +85,9 @@ public class SchematicItem extends Item {
 	}
 
 	public static void writeSize(HolderGetter<Block> lookup, ItemStack blueprint) {
-		CompoundTag tag = ItemHelper.getOrCreateComponent(blueprint, AllDataComponents.SCHEMATIC_DATA, new CompoundTag());
 		StructureTemplate t = loadSchematic(lookup, blueprint);
-		tag.put("Bounds", NBTHelper.writeVec3i(t.getSize()));
+		Vec3i size = t.getSize();
+		blueprint.set(AllDataComponents.SCHEMATIC_BOUNDS, size);
 		SchematicInstances.clearHash(blueprint);
 	}
 
@@ -101,10 +96,9 @@ public class SchematicItem extends Item {
 	}
 
 	public static StructurePlaceSettings getSettings(ItemStack blueprint, boolean processNBT) {
-		CompoundTag tag = blueprint.getOrDefault(AllDataComponents.SCHEMATIC_DATA, new CompoundTag());
 		StructurePlaceSettings settings = new StructurePlaceSettings();
-		settings.setRotation(Rotation.valueOf(tag.getString("Rotation")));
-		settings.setMirror(Mirror.valueOf(tag.getString("Mirror")));
+		settings.setRotation(blueprint.getOrDefault(AllDataComponents.SCHEMATIC_ROTATION, Rotation.NONE));
+		settings.setMirror(blueprint.getOrDefault(AllDataComponents.SCHEMATIC_MIRROR, Mirror.NONE));
 		if (processNBT)
 			settings.addProcessor(SchematicProcessor.INSTANCE);
 		return settings;
@@ -112,10 +106,8 @@ public class SchematicItem extends Item {
 
 	public static StructureTemplate loadSchematic(HolderGetter<Block> lookup, ItemStack blueprint) {
 		StructureTemplate t = new StructureTemplate();
-		String owner = blueprint.getOrDefault(AllDataComponents.SCHEMATIC_DATA, new CompoundTag())
-			.getString("Owner");
-		String schematic = blueprint.getOrDefault(AllDataComponents.SCHEMATIC_DATA, new CompoundTag())
-			.getString("File");
+		String owner = blueprint.getOrDefault(AllDataComponents.SCHEMATIC_OWNER, "");
+		String schematic = blueprint.getOrDefault(AllDataComponents.SCHEMATIC_FILE, "");
 
 		if (!schematic.endsWith(".nbt"))
 			return t;
@@ -172,7 +164,7 @@ public class SchematicItem extends Item {
 		if (!player.isShiftKeyDown() || hand != InteractionHand.MAIN_HAND)
 			return false;
 		if (!player.getItemInHand(hand)
-			.has(AllDataComponents.SCHEMATIC_DATA))
+			.has(AllDataComponents.SCHEMATIC_FILE))
 			return false;
 		EnvExecutor.runWhenOn(EnvType.CLIENT, () -> this::displayBlueprintScreen);
 		return true;

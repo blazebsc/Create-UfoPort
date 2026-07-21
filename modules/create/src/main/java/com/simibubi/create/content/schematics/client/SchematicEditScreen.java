@@ -13,15 +13,12 @@ import com.simibubi.create.foundation.gui.widget.IconButton;
 import com.simibubi.create.foundation.gui.widget.Label;
 import com.simibubi.create.foundation.gui.widget.ScrollInput;
 import com.simibubi.create.foundation.gui.widget.SelectionScrollInput;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.utility.Components;
 import com.simibubi.create.foundation.utility.Lang;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Mirror;
@@ -186,10 +183,8 @@ public class SchematicEditScreen extends AbstractSimiScreen {
 		if (validCoords && newLocation != null) {
 			ItemStack item = handler.getActiveSchematicItem();
 			if (item != null) {
-				ItemHelper.getOrCreateComponent(item, AllDataComponents.SCHEMATIC_DATA, new CompoundTag())
-					.putBoolean("Deployed", true);
-				ItemHelper.getOrCreateComponent(item, AllDataComponents.SCHEMATIC_DATA, new CompoundTag())
-					.put("Anchor", NbtUtils.writeBlockPos(newLocation));
+				item.set(AllDataComponents.SCHEMATIC_DEPLOYED, true);
+				item.set(AllDataComponents.SCHEMATIC_ANCHOR, newLocation);
 			}
 
 			handler.getTransformation()

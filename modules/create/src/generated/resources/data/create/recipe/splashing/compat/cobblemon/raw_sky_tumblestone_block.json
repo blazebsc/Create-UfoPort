@@ -1,0 +1,16 @@
+{
+  "fabric:load_conditions": [
+    { "condition": "fabric:all_mods_loaded", "values": ["cobblemon"] }
+  ],
+  "type": "create:splashing",
+  "ingredients": [
+    {
+      "item": "cobblemon:raw_sky_tumblestone_block"
+    }
+  ],
+  "results": [
+    {
+      "id": "cobblemon:polished_sky_tumblestone"
+    }
+  ]
+}

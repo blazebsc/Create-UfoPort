@@ -12,10 +12,8 @@ import com.simibubi.create.AllTags.AllBlockTags;
 import com.simibubi.create.Create;
 import com.simibubi.create.CreateClient;
 import com.simibubi.create.foundation.item.CustomArmPoseItem;
-import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.utility.BlockHelper;
 import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.NBTHelper;
 import com.simibubi.create.foundation.utility.NBTProcessors;
 import com.tterrag.registrate.fabric.EnvExecutor;
 
@@ -28,10 +26,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel.ArmPose;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
+
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
+
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -64,10 +61,8 @@ public abstract class ZapperItem extends Item implements CustomArmPoseItem, Enti
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
-		if (stack.has(AllDataComponents.ZAPPER) && stack.get(AllDataComponents.ZAPPER)
-			.contains("BlockUsed")) {
-			MutableComponent usedBlock = NbtUtils.readBlockState(Minecraft.getInstance().level.holderLookup(Registries.BLOCK), stack.get(AllDataComponents.ZAPPER)
-				.getCompound("BlockUsed"))
+		if (stack.has(AllDataComponents.SHAPER_BLOCK_USED)) {
+			MutableComponent usedBlock = stack.get(AllDataComponents.SHAPER_BLOCK_USED)
 				.getBlock()
 				.getName();
 			tooltip.add(Lang.translateDirect("terrainzapper.usingBlock",
@@ -80,14 +75,8 @@ public abstract class ZapperItem extends Item implements CustomArmPoseItem, Enti
 	@Override
 	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
 		boolean differentBlock = false;
-		if (oldStack.has(AllDataComponents.ZAPPER) && newStack.has(AllDataComponents.ZAPPER) && oldStack.get(AllDataComponents.ZAPPER)
-			.contains("BlockUsed")
-			&& newStack.get(AllDataComponents.ZAPPER)
-				.contains("BlockUsed"))
-			differentBlock = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), oldStack.get(AllDataComponents.ZAPPER)
-				.getCompound("BlockUsed")) != NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(),
-					newStack.get(AllDataComponents.ZAPPER)
-						.getCompound("BlockUsed"));
+		if (oldStack.has(AllDataComponents.SHAPER_BLOCK_USED) && newStack.has(AllDataComponents.SHAPER_BLOCK_USED))
+			differentBlock = oldStack.get(AllDataComponents.SHAPER_BLOCK_USED) != newStack.get(AllDataComponents.SHAPER_BLOCK_USED);
 		return slotChanged || !isZapper(newStack) || differentBlock;
 	}
 
@@ -118,7 +107,6 @@ public abstract class ZapperItem extends Item implements CustomArmPoseItem, Enti
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
 		ItemStack item = player.getItemInHand(hand);
-		CompoundTag nbt = ItemHelper.getOrCreateComponent(item, AllDataComponents.ZAPPER, new CompoundTag());
 		boolean mainHand = hand == InteractionHand.MAIN_HAND;
 
 		// Shift -> Open GUI
@@ -146,12 +134,12 @@ public abstract class ZapperItem extends Item implements CustomArmPoseItem, Enti
 		}
 
 		BlockState stateToUse = Blocks.AIR.defaultBlockState();
-		if (nbt.contains("BlockUsed"))
-			stateToUse = NbtUtils.readBlockState(world.holderLookup(Registries.BLOCK), nbt.getCompound("BlockUsed"));
+		if (item.has(AllDataComponents.SHAPER_BLOCK_USED))
+			stateToUse = item.get(AllDataComponents.SHAPER_BLOCK_USED);
 		stateToUse = BlockHelper.setZeroAge(stateToUse);
 		CompoundTag data = null;
-		if (AllBlockTags.SAFE_NBT.matches(stateToUse) && nbt.contains("BlockData", Tag.TAG_COMPOUND)) {
-			data = nbt.getCompound("BlockData");
+		if (AllBlockTags.SAFE_NBT.matches(stateToUse) && item.has(AllDataComponents.SHAPER_BLOCK_DATA)) {
+			data = item.get(AllDataComponents.SHAPER_BLOCK_DATA);
 		}
 
 		// Raytrace - Find the target
@@ -190,8 +178,7 @@ public abstract class ZapperItem extends Item implements CustomArmPoseItem, Enti
 	}
 
 	public Component validateUsage(ItemStack item) {
-		CompoundTag tag = ItemHelper.getOrCreateComponent(item, AllDataComponents.ZAPPER, new CompoundTag());
-		if (!canActivateWithoutSelectedBlock(item) && !tag.contains("BlockUsed"))
+		if (!canActivateWithoutSelectedBlock(item) && !item.has(AllDataComponents.SHAPER_BLOCK_USED))
 			return Lang.translateDirect("terrainzapper.leftClickToSet");
 		return null;
 	}
@@ -235,8 +222,7 @@ public abstract class ZapperItem extends Item implements CustomArmPoseItem, Enti
 	}
 
 	public static void configureSettings(ItemStack stack, PlacementPatterns pattern) {
-		CompoundTag nbt = ItemHelper.getOrCreateComponent(stack, AllDataComponents.ZAPPER, new CompoundTag());
-		NBTHelper.writeEnum(nbt, "Pattern", pattern);
+		stack.set(AllDataComponents.PLACEMENT_PATTERN, pattern);
 	}
 
 	public static void setBlockEntityData(Level world, BlockPos pos, BlockState state, CompoundTag data, Player player) {
