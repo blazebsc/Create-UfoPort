@@ -17,8 +17,8 @@
     "Vlad2509"
   ],
   "contact": {
-    "issues": "https://github.com/Fabricators-of-Create/Create/issues",
-    "sources": "https://github.com/Fabricators-of-Create/Create"
+    "issues": "https://github.com/blazebsc/Create-UfoPort/issues",
+    "sources": "https://github.com/blazebsc/Create-UfoPort"
   },
   "depends": {
     "fabricloader": ">=${loader_version}",
