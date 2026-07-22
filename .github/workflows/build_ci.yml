@@ -5,6 +5,7 @@ on:
     branches: [1.21]
   pull_request:
     branches: [1.21]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -59,7 +60,7 @@ jobs:
 
   release:
     needs: build
-    if: needs.build.outputs.release == 'true' && github.event_name == 'push'
+    if: needs.build.outputs.release == 'true' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -67,7 +68,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: create-jabric-ufoport
+          name: create-fabric-ufoport
           path: build/libs/
 
       - name: Create Release
