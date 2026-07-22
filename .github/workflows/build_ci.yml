@@ -1,30 +1,29 @@
-name: Build Mod JAR
+name: Build & Release
 
 on:
   push:
-    branches:
-      - 1.21
+    branches: [1.21]
   pull_request:
-    branches:
-      - 1.21
+    branches: [1.21]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      do_release: ${{ steps.check_tag.outputs.do_release }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup JDK 21
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
         with:
-          distribution: 'temurin'
-          java-version: '21'
-          cache: 'gradle'
+          fetch-depth: 0
 
-      - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@v4
+      - uses: gradle/actions/wrapper-validation@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -38,3 +37,44 @@ jobs:
           name: create-fabric-ufoport
           path: build/libs/*.jar
           if-no-files-found: error
+
+      - name: Extract version from gradle.properties
+        id: version
+        run: |
+          VERSION=$(grep '^mod_version' gradle.properties | sed 's/.*= *//')
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Mod version: ${VERSION}"
+
+      - name: Check if tag already exists
+        id: check_tag
+        run: |
+          TAG="v${{ steps.version.outputs.version }}"
+          if git rev-parse "${TAG}" >/dev/null 2>&1; then
+            echo "Tag ${TAG} already exists — skipping release."
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Will create release for ${TAG}"
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  release:
+    needs: build
+    if: needs.build.outputs.release == 'true' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: create-jabric-ufoport
+          path: build/libs/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          prerelease: true
+          tag_name: v${{ needs.build.outputs.version }}
+          name: Pre-release v${{ needs.build.outputs.version }}
+          files: build/libs/*.jar

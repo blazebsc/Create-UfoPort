@@ -1,27 +1,44 @@
 ---
-name: Crash
-about: The game crashed
-title: CRASH
+name: Crash Report
+about: Report a game crash
+title: "[CRASH] "
 labels: crash
-assignees: vlad250906
-
+assignees: blazebsc
 ---
 
-### **Description**
-How did it happen
+### Description
+A clear description of what led to the crash.
 
-### **How to reproduce**
-How to get the same result on other's PC
+### Steps to reproduce
+1. 
+2. 
+3. 
 
-### **MC client info**
- - MC version (1.21 / 1.21.2 / ...)
- - Create-UFO version
+### Environment
+- MC version:
+- Mod version:
+- Mod loader (Fabric/Quilt):
+- Other mods installed:
 
-### **Crash report file**
-.../crash-reports/crash-***.txt
+### Crash report
+<details>
+<summary>crash-report</summary>
 
-### **Client log file**
-.../logs/latest.txt
+```
+Paste crash report here
+```
 
-### **Additional context**
-Screenshots, videos, any other information
+</details>
+
+### Latest log
+<details>
+<summary>latest.log</summary>
+
+```
+Paste latest.log here
+```
+
+</details>
+
+### Additional context
+Any other context about this problem.

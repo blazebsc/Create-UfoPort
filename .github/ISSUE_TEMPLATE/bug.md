@@ -1,24 +1,40 @@
 ---
-name: Bug
-about: When something doesn't work as intended
-title: BUG
+name: Bug Report
+about: Report a bug or unexpected behavior
+title: "[Bug] "
 labels: bug
-assignees: vlad250906
-
+assignees: blazebsc
 ---
 
-### **Description**
-What is wrong and why
+### Description
+A clear description of what the bug is.
 
-### **How to reproduce**
-How to get the same result on other's PC
+### Steps to reproduce
+1. 
+2. 
+3. 
 
-### **MC client info**
- - MC version (1.21 / 1.21.2 / ...)
- - Create-UFO version
+### Expected behavior
+What should have happened.
 
-### **Client log file**
-.../logs/latest.txt
+### Actual behavior
+What actually happened.
 
-### **Additional context**
-Screenshots, videos, any other information
+### Environment
+- MC version:
+- Mod version:
+- Mod loader (Fabric/Quilt):
+- Other mods installed:
+
+### Logs
+<details>
+<summary>latest.log</summary>
+
+```
+Paste your latest.log here
+```
+
+</details>
+
+### Screenshots / Media
+If applicable, attach screenshots or videos.
