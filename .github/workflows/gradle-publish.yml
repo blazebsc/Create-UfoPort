@@ -2,8 +2,11 @@ name: Gradle Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - 1.21
+    paths:
+      - 'gradle.properties'
+      - 'src/main/resources/fabric.mod.json'
 
 jobs:
   build:
@@ -14,11 +17,40 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from gradle.properties
+        id: version
+        run: |
+          VERSION=$(grep '^mod_version' gradle.properties | sed 's/.*= *//')
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Mod version: ${VERSION}"
+
+      - name: Check if tag already exists
+        id: check_tag
+        run: |
+          TAG="v${{ steps.version.outputs.version }}"
+          if git rev-parse "${TAG}" >/dev/null 2>&1; then
+            echo "Tag ${TAG} already exists — skipping release."
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create git tag
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          TAG="v${{ steps.version.outputs.version }}"
+          git tag "${TAG}"
+          git push origin "${TAG}"
 
       - name: Validate Gradle wrapper
+        if: steps.check_tag.outputs.exists == 'false'
         uses: gradle/actions/wrapper-validation@v4
 
       - name: Setup JDK 21
+        if: steps.check_tag.outputs.exists == 'false'
         uses: actions/setup-java@v4
         with:
           java-version: '21'
@@ -26,15 +58,19 @@ jobs:
           cache: 'gradle'
 
       - name: Make gradlew executable
+        if: steps.check_tag.outputs.exists == 'false'
         run: chmod +x ./gradlew
 
       - name: Build
+        if: steps.check_tag.outputs.exists == 'false'
         run: ./gradlew build --stacktrace
 
       - name: Create Release
+        if: steps.check_tag.outputs.exists == 'false'
         uses: softprops/action-gh-release@v2
         with:
           draft: true
           prerelease: true
-          name: "Pre-release ${{ github.ref_name }}"
+          tag_name: "v${{ steps.version.outputs.version }}"
+          name: "Pre-release v${{ steps.version.outputs.version }}"
           files: build/libs/*.jar
