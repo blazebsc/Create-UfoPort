@@ -37,7 +37,10 @@ repositories {
     maven { url = "https://maven.tterrag.com/" } // Flywheel
     maven { url = "https://maven.shedaniel.me/" } // REI and deps
     maven { url = "https://api.modrinth.com/maven" } // LazyDFU, Sodium, Sandwichable
-    maven { url = "https://maven.terraformersmc.com/" } // Mod Menu, Trinkets
+    maven {
+          url = "https://maven.terraformersmc.com/"
+          content { includeGroup("com.terraformersmc") }
+     }
     maven { url = "https://squiddev.cc/maven" } // CC:T
     maven { url = "https://modmaven.dev" } // Botania
     maven { // Reach Entity Attributes
@@ -118,7 +121,10 @@ allprojects {
     		maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // Forge Config API Port
     		maven { url = "https://maven.tterrag.com/" } // Flywheel
 maven { url = "https://api.modrinth.com/maven" } // LazyDFU, Sodium, Sandwichable, ModMenu
-     maven { url = "https://maven.terraformersmc.com/" } // Trinkets, ModMenu fallback
+     maven {
+          url = "https://maven.terraformersmc.com/"
+          content { includeGroup("com.terraformersmc") }
+     }
      maven { url = "https://squiddev.cc/maven" } // CC:T
      maven { url = "https://modmaven.dev" } // Botania
      maven { url = "https://maven.impactdev.net/repository/development/" } // Cobblemon
