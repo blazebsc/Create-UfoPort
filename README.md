@@ -19,7 +19,7 @@ If you find any incompatibility with a mod, feel free to open an issue or send a
 ## Building from Source
 
 ```
-git clone https://github.com/vlad250906/Create-UfoPort.git
+git clone https://github.com/blazebsc/Create-UfoPort.git
 cd Create-UfoPort
 ./gradlew build
 ```

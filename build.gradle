@@ -79,7 +79,7 @@ def devEnv(DependencyHandler deps) {
 // setup mods that are available for compatibility reasons
 def compat(DependencyHandler deps) {
 
-        deps.modCompileOnly("com.terraformersmc:modmenu:$modmenu_version")
+        deps.modCompileOnly("maven.modrinth:modmenu:$modmenu_version")
         deps.modCompileOnly("maven.modrinth:sodium:$sodium_version")
         deps.modCompileOnly("maven.modrinth:indium:$indium_version")
         deps.modCompileOnly("maven.modrinth:iris:$iris_version")
@@ -117,11 +117,11 @@ allprojects {
     		maven { url = "https://maven.blamejared.com/" } // JEI (was maven.vram.io, which is dead)
     		maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // Forge Config API Port
     		maven { url = "https://maven.tterrag.com/" } // Flywheel
-    		maven { url = "https://api.modrinth.com/maven" } // LazyDFU, Sodium, Sandwichable
-    		maven { url = "https://maven.terraformersmc.com/" } // Mod Menu, Trinkets
-    		maven { url = "https://squiddev.cc/maven" } // CC:T
-    		maven { url = "https://modmaven.dev" } // Botania
-    		maven { url = "https://maven.impactdev.net/repository/development/" } // Cobblemon
+maven { url = "https://api.modrinth.com/maven" } // LazyDFU, Sodium, Sandwichable, ModMenu
+     maven { url = "https://maven.terraformersmc.com/" } // Trinkets, ModMenu fallback
+     maven { url = "https://squiddev.cc/maven" } // CC:T
+     maven { url = "https://modmaven.dev" } // Botania
+     maven { url = "https://maven.impactdev.net/repository/development/" } // Cobblemon
 	}
 
 	dependencies {
