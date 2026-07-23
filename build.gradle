@@ -44,18 +44,6 @@ modrinth {
     dependencies = [
         new ModDependency("fabric-api", "required"),
         new ModDependency("forge-config-api-port", "required"),
-        // Incompatible — mirrors the `breaks` block in fabric.mod.json
-        new ModDependency("colormatic", "incompatible"),
-        new ModDependency("iris", "incompatible"),
-        new ModDependency("sodium", "incompatible"),
-        new ModDependency("create-enchantment-industry", "incompatible"),
-        new ModDependency("missions", "incompatible"),
-        new ModDependency("create-power-loader", "incompatible"),
-        new ModDependency("copycats", "incompatible"),
-        new ModDependency("create-jetpack", "incompatible"),
-        new ModDependency("createorigins", "incompatible"),
-        new ModDependency("exposure", "incompatible"),
-        new ModDependency("cobblegen", "incompatible"),
     ]
 }
 
