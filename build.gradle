@@ -42,27 +42,27 @@ modrinth {
 
     // Required dependencies — will appear on the Modrinth version page
     dependencies = [
-        new ModDependency("P7dR5mFX", "required"), // fabric-api
-        new ModDependency("3tt3VGlF", "required"), // forge-config-api-port
+        new ModDependency("fabric-api", "required"),
+        new ModDependency("forge-config-api-port", "required"),
         // Incompatible — mirrors the `breaks` block in fabric.mod.json
-        new ModDependency("optifine", "incompatible"),
+        new ModDependency("optifabric", "incompatible"),
         new ModDependency("colormatic", "incompatible"),
         new ModDependency("iris", "incompatible"),
         new ModDependency("sodium", "incompatible"),
         new ModDependency("railways", "incompatible"),
-        new ModDependency("create_enchantment_industry", "incompatible"),
-        new ModDependency("create_interactive", "incompatible"),
+        new ModDependency("create-enchantment-industry", "incompatible"),
+        new ModDependency("create-interactive", "incompatible"),
         new ModDependency("createfabricfixes", "incompatible"),
         new ModDependency("garnished", "incompatible"),
         new ModDependency("extendedgears", "incompatible"),
         new ModDependency("missions", "incompatible"),
-        new ModDependency("create_so", "incompatible"),
+        new ModDependency("create-so", "incompatible"),
         new ModDependency("createdieselgenerators", "incompatible"),
-        new ModDependency("create_power_loader", "incompatible"),
+        new ModDependency("create-power-loader", "incompatible"),
         new ModDependency("createbigcannons", "incompatible"),
         new ModDependency("copycats", "incompatible"),
         new ModDependency("sliceanddice", "incompatible"),
-        new ModDependency("create_jetpack", "incompatible"),
+        new ModDependency("create-jetpack", "incompatible"),
         new ModDependency("createorigins", "incompatible"),
         new ModDependency("exposure", "incompatible"),
         new ModDependency("cobblegen", "incompatible"),
