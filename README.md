@@ -2,9 +2,11 @@
 
 An unofficial port of [Create Fabric](https://modrinth.com/mod/create-fabric) for Minecraft 1.21 / 1.21.1.
 
+Originally ported to 1.21 by Vlad2509; patches and bug fixes by BlazeBSC.
+
 ## Installation
 
-Download the mod from [Releases](https://github.com/vlad250906/Create-UfoPort/releases/) and install the required dependencies:
+Download the mod from [Releases](https://github.com/blazebsc/Create-UfoPort/releases/) and install the required dependencies:
 
 - [Fabric Loader](https://fabricmc.net/use/installer/) (>= 0.16.0)
 - [Fabric API](https://modrinth.com/mod/fabric-api) (>= 0.100.7)
@@ -12,7 +14,9 @@ Download the mod from [Releases](https://github.com/vlad250906/Create-UfoPort/re
 
 ## Known Incompatibilities
 
-- [Farmer's Delight](https://modrinth.com/mod/farmers-delight-refabricated)
+- [Farmer's Delight Refabricated](https://modrinth.com/mod/farmers-delight-refabricated)
+- Any outdated Create add-ons listed in the `breaks` section of `fabric.mod.json`.
+  Always use the latest builds of Create addons when using UfoPort.
 
 If you find any incompatibility with a mod, feel free to open an issue or send a pull request.
 
@@ -27,7 +31,7 @@ cd Create-UfoPort
 The output jar is in `build/libs/`.
 
 ## Credits
-- [1.21-1.21.1 Port Of Create Fabric](https://github.com/blazebsc/Create-UfoPort)
+- [1.21-1.21.1 Port Of Create Fabric (upstream)](https://github.com/vlad250906/Create-UfoPort)
 - [Create Fabric](https://github.com/Fabricators-of-Create/Create)
 - [Porting Lib](https://github.com/Fabricators-of-Create/Porting-Lib)
 - [Flywheel](https://github.com/Engine-Room/Flywheel)

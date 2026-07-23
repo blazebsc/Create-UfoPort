@@ -1,5 +1,6 @@
 import io.github.fabricators_of_create.porting_lib_build.tasks.FmjExpander
 import io.github.fabricators_of_create.porting_lib_build.PortingLibBuildPlugin
+import com.modrinth.minotaur.dependencies.ModDependency
 
 plugins {
     id "fabric-loom"
@@ -16,10 +17,57 @@ targetCompatibility = JavaVersion.VERSION_21
 
 archivesBaseName = "create-fabric-ufoport"
 group = project.maven_group
-
-String runNumber = "37483"
-String build = runNumber != null ? "build.$runNumber" : "local"
 version = "$mod_version+mc$displayed_mc_versions"
+
+// ============================================================================
+// Modrinth publishing (minotaur)
+//   docs: https://github.com/modrinth/minotaur
+//   token: set MODRINTH_TOKEN env var (CI secret) before running
+//          `./gradlew modrinth`
+// ============================================================================
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN") ?: ""
+    // Project slug on modrinth.com — set once the project is created
+    projectId = System.getenv("MODRINTH_PROJECT_ID") ?: System.getProperty("modrinth.projectId", "")
+    versionNumber = version
+    versionName = "Create-UfoPort v$mod_version - MC $displayed_mc_versions"
+    // "release", "beta", or "alpha"
+    versionType = System.getProperty("modrinth.versionType", "beta")
+    changelog = file("CHANGELOG.md").text
+    uploadFile = remapJar
+    gameVersions = ["1.21", "1.21.1"]
+    loaders = ["fabric"]
+    // Optional metadata
+    syncBodyFrom = file("README.md").text
+
+    // Required dependencies — will appear on the Modrinth version page
+    dependencies = [
+        new ModDependency("P7dR5mFX", "required"), // fabric-api
+        new ModDependency("3tt3VGlF", "required"), // forge-config-api-port
+        // Incompatible — mirrors the `breaks` block in fabric.mod.json
+        new ModDependency("optifine", "incompatible"),
+        new ModDependency("colormatic", "incompatible"),
+        new ModDependency("iris", "incompatible"),
+        new ModDependency("sodium", "incompatible"),
+        new ModDependency("railways", "incompatible"),
+        new ModDependency("create_enchantment_industry", "incompatible"),
+        new ModDependency("create_interactive", "incompatible"),
+        new ModDependency("createfabricfixes", "incompatible"),
+        new ModDependency("garnished", "incompatible"),
+        new ModDependency("extendedgears", "incompatible"),
+        new ModDependency("missions", "incompatible"),
+        new ModDependency("create_so", "incompatible"),
+        new ModDependency("createdieselgenerators", "incompatible"),
+        new ModDependency("create_power_loader", "incompatible"),
+        new ModDependency("createbigcannons", "incompatible"),
+        new ModDependency("copycats", "incompatible"),
+        new ModDependency("sliceanddice", "incompatible"),
+        new ModDependency("create_jetpack", "incompatible"),
+        new ModDependency("createorigins", "incompatible"),
+        new ModDependency("exposure", "incompatible"),
+        new ModDependency("cobblegen", "incompatible"),
+    ]
+}
 
 repositories {
     maven { url = "https://maven.quiltmc.org/repository/release" } // QM

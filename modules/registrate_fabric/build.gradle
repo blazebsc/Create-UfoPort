@@ -1,5 +1,1 @@
-dependencies {
-	
-}
-
 portingLib.addModuleDependency("porting_lib_ufo")

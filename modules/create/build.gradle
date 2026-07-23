@@ -1,7 +1,3 @@
-dependencies {
-    
-}
-
 portingLib.addModuleDependency("flywheel")
 portingLib.addModuleDependency("milk")
 portingLib.addModuleDependency("porting_lib_ufo")
