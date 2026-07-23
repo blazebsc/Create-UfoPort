@@ -69,6 +69,8 @@ modrinth {
     ]
 }
 
+tasks.named("modrinth") { dependsOn(tasks.named("optimizeOutputsOfRemapJar")) }
+
 repositories {
     maven { url = "https://maven.quiltmc.org/repository/release" } // QM
     maven { url = "https://maven.parchmentmc.org" } // Parchment
