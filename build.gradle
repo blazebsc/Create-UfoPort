@@ -31,8 +31,14 @@ modrinth {
     projectId = System.getenv("MODRINTH_PROJECT_ID") ?: System.getProperty("modrinth.projectId", "")
     versionNumber = version
     versionName = "Create-UfoPort v$mod_version - MC $displayed_mc_versions"
-    // "release", "beta", or "alpha"
-    versionType = System.getProperty("modrinth.versionType", "beta")
+    // Auto-detect version type from mod_version:
+    //   0.0.x → alpha,  0.x.x → beta,  x.x.x → release
+    def versionParts = mod_version.tokenize(".")
+    def autoVersionType = versionParts.size() >= 3
+        ? versionParts[0] == "0" && versionParts[1] == "0" ? "alpha"
+        : versionParts[0] == "0" ? "beta" : "release"
+        : "beta"
+    versionType = System.getProperty("modrinth.versionType", autoVersionType)
     changelog = file("CHANGELOG.md").text
     uploadFile = remapJar
     gameVersions = ["1.21", "1.21.1"]
