@@ -19,6 +19,37 @@ archivesBaseName = "create-fabric-ufoport"
 group = project.maven_group
 version = "$mod_version+mc$displayed_mc_versions"
 
+// Single source of truth for maven repos (root + subprojects were drifted).
+ext.sharedRepos = { RepositoryHandler h ->
+	h.maven { url = "https://maven.quiltmc.org/repository/release" } // QM
+	h.maven { url = "https://maven.parchmentmc.org" } // Parchment
+	h.maven { url = "https://maven.fabricmc.net/" } // FAPI, Loader
+	h.maven { url = "https://mvn.devos.one/snapshots/" } // Registrate, Forge Tags, Milk Lib
+	h.maven { url = "https://mvn.devos.one/releases/" } // Porting Lib
+	h.maven { // for Porting Lib: Mixin Extras, Fabric ASM
+		url = "https://jitpack.io/"
+		content { includeGroupAndSubgroups("com.github") }
+	}
+	h.maven { url = "https://maven.dblsaiko.net/" }
+	h.maven { url = "https://maven.blamejared.com/" } // JEI (was maven.vram.io, which is dead)
+	h.maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // Forge Config API Port
+	h.maven { url = "https://maven.tterrag.com/" } // Flywheel
+	h.maven { url = "https://maven.shedaniel.me/" } // REI and deps
+	h.maven { url = "https://api.modrinth.com/maven" } // LazyDFU, Sodium, Sandwichable, ModMenu, EMI
+	h.maven {
+		url = "https://maven.terraformersmc.com/"
+		content { includeGroup("com.terraformersmc") }
+	}
+	h.maven { url = "https://squiddev.cc/maven" } // CC:T
+	h.maven { url = "https://modmaven.dev" } // Botania
+	h.maven { // Reach Entity Attributes
+		url = "https://maven.jamieswhiteshirt.com/libs-release"
+		content { includeGroup("com.jamieswhiteshirt") }
+	}
+	h.maven { url = "https://maven.ladysnake.org/releases" } // CCA, for Trinkets
+	h.maven { url = "https://maven.impactdev.net/repository/development/" } // Cobblemon
+}
+
 // ============================================================================
 // Modrinth publishing (minotaur)
 //   docs: https://github.com/modrinth/minotaur
@@ -35,11 +66,12 @@ modrinth {
     //   0.0.x → alpha,  0.x.x → beta,  x.x.x → release
     def versionParts = mod_version.tokenize(".")
     def autoVersionType = versionParts.size() >= 3
-        ? versionParts[0] == "0" && versionParts[1] == "0" ? "alpha"
-        : versionParts[0] == "0" ? "beta" : "release"
+        ? ((versionParts[0] == "0" && versionParts[1] == "0") ? "alpha" : ((versionParts[0] == "0") ? "beta" : "release"))
         : "beta"
     versionType = System.getProperty("modrinth.versionType", autoVersionType)
-    changelog = file("CHANGELOG.md").text
+    def changelogFile = file("CHANGELOG.md")
+    def changelogText = changelogFile.exists() ? changelogFile.text.trim() : ""
+    changelog = changelogText ?: "See https://github.com/blazebsc/Create-UfoPort/releases for release notes."
     uploadFile = remapJar
     gameVersions = ["1.21", "1.21.1"]
     loaders = ["fabric"]
@@ -56,32 +88,7 @@ modrinth {
 tasks.named("modrinth") { dependsOn(tasks.named("optimizeOutputsOfRemapJar")) }
 
 repositories {
-    maven { url = "https://maven.quiltmc.org/repository/release" } // QM
-    maven { url = "https://maven.parchmentmc.org" } // Parchment
-    maven { url = "https://maven.fabricmc.net/" } // FAPI, Loader
-    maven { url = "https://mvn.devos.one/snapshots/" } // Registrate, Forge Tags, Milk Lib
-    maven { url = "https://mvn.devos.one/releases/" } // Porting Lib
-    maven { // for Porting Lib: Mixin Extras, Fabric ASM
-        url = "https://jitpack.io/"
-        content { includeGroupAndSubgroups("com.github") }
-    }
-    maven { url = "https://maven.dblsaiko.net/" }
-    maven { url = "https://maven.blamejared.com/" } // JEI (was maven.vram.io, which is dead)
-    maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // Forge Config API Port
-    maven { url = "https://maven.tterrag.com/" } // Flywheel
-    maven { url = "https://maven.shedaniel.me/" } // REI and deps
-    maven { url = "https://api.modrinth.com/maven" } // LazyDFU, Sodium, Sandwichable
-    maven {
-          url = "https://maven.terraformersmc.com/"
-          content { includeGroup("com.terraformersmc") }
-     }
-    maven { url = "https://squiddev.cc/maven" } // CC:T
-    maven { url = "https://modmaven.dev" } // Botania
-    maven { // Reach Entity Attributes
-        url = "https://maven.jamieswhiteshirt.com/libs-release"
-        content { includeGroup("com.jamieswhiteshirt") }
-    }
-    maven { url = "https://maven.ladysnake.org/releases" } // CCA, for Trinkets
+	sharedRepos(it)
 }
 
 

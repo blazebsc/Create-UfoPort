@@ -9,6 +9,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import com.simibubi.create.Create;
 import com.simibubi.create.content.kinetics.deployer.ItemApplicationRecipe;
 import com.simibubi.create.content.processing.recipe.ProcessingRecipeBuilder.ProcessingRecipeFactory;
 import com.simibubi.create.foundation.fluid.FluidIngredient;
@@ -139,8 +140,16 @@ public class ProcessingRecipeSerializer<T extends ProcessingRecipe<?>> implement
 		for(Object ob : res) {
 			if (ob instanceof FluidStack) {
 				fluidResults.add((FluidStack)ob);
-			}else {
-				results.add((ProcessingOutput)ob);
+			} else if (ob instanceof ProcessingOutput output) {
+				if (output.getStack().isEmpty()) {
+					// Lenient compatDatagenOutput parsing (CODEC_RIGHT) accepts ids that are not
+					// items, e.g. fluids from other mods' recipes. Encoding those would throw
+					// "Empty ItemStack not allowed" on every recipe sync, so drop them instead.
+					Create.LOGGER.warn("Skipping empty item result in processing recipe;"
+							+ " output id is not a registered item (possibly a fluid).");
+					continue;
+				}
+				results.add(output);
 			}
 		}
 		builder.withItemIngredients(ingredients)
